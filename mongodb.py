@@ -54,7 +54,7 @@ def update_my_stock(user_name, stockNumber, condition, target_price):
     db = constructor_stock()
     collect = db[user_name]
     collect.update_many({'favorite_stock': stockNumber}, {'$set': {'condition': condition, 'price': target_price}})
-    content = f'{stockNumber}已更成功'
+    content = f'{stockNumber}已更新成功'
     return content
 
 def show_my_stock(user_name, userID):
