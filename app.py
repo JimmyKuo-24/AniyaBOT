@@ -347,7 +347,7 @@ def handle_message(event):
             url = 'https://tw.stock.yahoo.com/q/q?s=' + stock
             list_req = requests.get(url)
             soup = BeautifulSoup(list_req.content, 'html.parser')
-            getstock = soup.find_all('span', class_='Fz(32px)').string
+            getstock = soup.find('span', class_='Fz(32px)').string
             content = stock + '當前股價為：' + getstock
             if condition == '<':
                 content = '\n篩選條件為：<' + price
