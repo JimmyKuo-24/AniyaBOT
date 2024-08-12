@@ -8,6 +8,16 @@ import re, requests, twstock, datetime, Msg_Template, mongodb, EXRate
 
 app = Flask(__name__)
 
+def cache_users_stock():
+    db = mongodb.constructor_stock()
+    nameList = db.list_collection_names()
+    users = []
+    for i in range(len(nameList)):
+        collect = db[nameList[i]]
+        cel = list(collect.find({'tag': 'stock'}))
+        users.append(cel)
+    return users
+
 def oil_price():
     target_url = 'https://gas.goodlife.tw/'
     rs = requests.session()
@@ -89,7 +99,7 @@ def Usage(event):
                     "contents": [
                     {
                         "type": "text",
-                        "text": "☸ 今日油價 ➦輸入➦ 查詢油價",
+                        "text": "☸ 今日油價➦輸入➦查詢油價",
                         "size": "sm",
                         "flex": 5,
                         "weight": "bold"
@@ -111,7 +121,7 @@ def Usage(event):
                     "contents": [
                     {
                         "type": "text",
-                        "text": "☸ 今日匯率 ➦輸入➦ 查詢匯率",
+                        "text": "☸ 今日匯率➦輸入➦查詢匯率",
                         "size": "sm",
                         "flex": 5,
                         "weight": "bold"
@@ -324,6 +334,42 @@ def handle_message(event):
             event.reply_token,
             TextSendMessage(text=content)
         )
+
+    if re.match('關閉提醒', msg):
+        import schedule
+        import time
+        def look_stock_price(stock, condition, price, userID):
+            print(userID)
+            url = 'https://tw.stock.yahoo.com/q/q?s=' + stock
+            list_req = requests.get(url)
+            soup = BeautifulSoup(list_req.content, 'html.parser')
+            getstock = soup.find_all('span', class_='Fz(32px)').string
+            content = stock + '當前股價為：' + getstock
+            if condition == '<':
+                content = '\n篩選條件為：<' + price
+                if float(getstock) < float(price):
+                    content += '\n符合' + getstock + '<' + price + '的篩選條件'
+                    line_bot_api.push_message(userID, TextSendMessage(text=content))
+            elif condition == '>':
+                content = '\n篩選條件為：>' + price
+                if float(getstock) > float(price):
+                    content += '\n符合' + getstock + '>' + price + '的篩選條件'
+                    line_bot_api.push_message(userID, TextSendMessage(text=content))
+            elif condition == '=':
+                content = '\n篩選條件為：=' + price
+                if float(getstock) > float(price):
+                    content += '\n符合' + getstock + '=' + price + '的篩選條件'
+                    line_bot_api.push_message(userID, TextSendMessage(text=content))
+        
+        def job():
+            print('HH')
+            datalist = cache_users_stock()
+            for i in range(len(datalist)):
+                for j in range(len(datalist[i])):
+                    look_stock_price(datalist[i][j]['favorite_stock'], datalist[i][j]['condition'], datalist[i][j]['price'], datalist[i][j]['userID'])
+
+        schedule.every(10).seconds.do(job).tag('dalily'+uid, 'second')
+
 
     #################################### 外匯區 ##########################################
 

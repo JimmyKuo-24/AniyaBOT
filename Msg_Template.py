@@ -319,7 +319,7 @@ def yt_channel():
                             "contents": [
                             {
                                 "type": "icon",
-                                "url": "https://www.youtube.com/@xiao_lin_shuo/featured"
+                                "url": "https://scdn.line-apps.com/n/channel_devcenter/img/fx/review_gold_star_28.png"
                             },
                             {
                                 "type": "text",
@@ -339,7 +339,7 @@ def yt_channel():
                             "action": {
                             "type": "uri",
                             "label": "點我觀看",
-                            "uri": "https://www.youtube.com/@CKGOChannelShow/featured"
+                            "uri": "https://www.youtube.com/@xiao_lin_shuo/featured"
                             }
                         },
                         {
