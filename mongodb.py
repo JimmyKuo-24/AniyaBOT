@@ -46,7 +46,7 @@ def write_my_stock(userID, user_name, stockNumber, condition, target_price):
         content = update_my_stock(user_name, stockNumber, condition, target_price)
         return content
     else:
-        collect.insert_one({'userID': userID, 'favorite_stock': stockNumber, 'condition': condition, 'target_price': target_price,
+        collect.insert_one({'userID': userID, 'favorite_stock': stockNumber, 'condition': condition, 'price': target_price,
                             'tag': 'stock', 'date_info':datetime.datetime.now()})
         return f'{stockNumber}已加入追蹤清單'
 
