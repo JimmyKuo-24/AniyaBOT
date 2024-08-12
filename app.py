@@ -337,6 +337,10 @@ def handle_message(event):
 
     if re.match('關閉提醒', msg):
         import schedule
+        schedule.clear()
+
+    if re.match('股價提醒', msg):
+        import schedule
         import time
         def look_stock_price(stock, condition, price, userID):
             print(userID)
