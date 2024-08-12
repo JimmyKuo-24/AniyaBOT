@@ -350,17 +350,17 @@ def handle_message(event):
             getstock = soup.find('span', class_='Fz(32px)').string
             content = stock + '當前股價為：' + getstock
             if condition == '<':
-                content = '\n篩選條件為：<' + price
+                content += '\n篩選條件為：<' + price
                 if float(getstock) < float(price):
                     content += '\n符合' + getstock + '<' + price + '的篩選條件'
                     line_bot_api.push_message(userID, TextSendMessage(text=content))
             elif condition == '>':
-                content = '\n篩選條件為：>' + price
+                content += '\n篩選條件為：>' + price
                 if float(getstock) > float(price):
                     content += '\n符合' + getstock + '>' + price + '的篩選條件'
                     line_bot_api.push_message(userID, TextSendMessage(text=content))
             elif condition == '=':
-                content = '\n篩選條件為：=' + price
+                content += '\n篩選條件為：=' + price
                 if float(getstock) == float(price):
                     content += '\n符合' + getstock + '=' + price + '的篩選條件'
                     line_bot_api.push_message(userID, TextSendMessage(text=content))
@@ -372,7 +372,10 @@ def handle_message(event):
                 for j in range(len(datalist[i])):
                     look_stock_price(datalist[i][j]['favorite_stock'], datalist[i][j]['condition'], datalist[i][j]['price'], datalist[i][j]['userID'])
 
-        schedule.every(10).seconds.do(job).tag('dalily'+uid, 'second')
+        schedule.every(8).seconds.do(job).tag('dalily-task-stock'+uid, 'second')
+        while True: 
+            schedule.run_pending()
+            time.sleep(1)
 
 
     #################################### 外匯區 ##########################################
