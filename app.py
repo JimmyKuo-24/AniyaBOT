@@ -8,162 +8,7 @@ import re, requests, twstock, datetime, Msg_Template, mongodb, EXRate
 
 app = Flask(__name__)
 
-def cache_users_stock():
-    db = mongodb.constructor_stock()
-    nameList = db.list_collection_names()
-    users = []
-    for i in range(len(nameList)):
-        collect = db[nameList[i]]
-        cel = list(collect.find({'tag': 'stock'}))
-        users.append(cel)
-    return users
-
-def oil_price():
-    target_url = 'https://gas.goodlife.tw/'
-    rs = requests.session()
-    res = rs.get(target_url, verify=False)
-    res.encoding = 'utf-8'
-    soup = BeautifulSoup(res.text, 'html.parser')
-    title = soup.select('#main')[0].text.replace('\n', '').split("(")[0]
-    gas_price = soup.select('#gas-price')[0].text.replace('\n\n\n', '').replace(' ', '')
-    cpc = soup.select('#cpc')[0].text.replace(' ', '')
-    content = '{}\n{}{}'.format(title, gas_price, cpc)
-    return content
-
-def push_msg(event, msg):   # 推播訊息 free 200則/月
-    try:
-        user_id = event.source.user_id
-        line_bot_api.push_message(user_id, TextSendMessage(text=msg))
-    except:
-        room_id = event.source.user_id
-        line_bot_api.push_message(room_id, TextSendMessage(text=msg))
-
-def Usage(event):
-    guide_msg = {
-        "type": "bubble",
-        "hero": {
-            "type": "image",
-            "url": "https://i.imgur.com/DzvWgBs.jpg",
-            "size": "full",
-            "aspectRatio": "20:13",
-            "aspectMode": "cover",
-            "action": {
-            "type": "uri",
-            "uri": "https://line.me/"
-            }
-        },
-        "body": {
-            "type": "box",
-            "layout": "vertical",
-            "contents": [
-            {
-                "type": "text",
-                "text": "✯ ✯ ✯ 查詢方法 ✯ ✯ ✯",
-                "weight": "bold",
-                "size": "lg",
-                "align": "center"
-            },
-            {
-                "type": "box",
-                "layout": "vertical",
-                "margin": "lg",
-                "spacing": "sm",
-                "contents": [
-                {
-                    "type": "box",
-                    "layout": "baseline",
-                    "spacing": "sm",
-                    "contents": [
-                    {
-                        "type": "text",
-                        "text": "請輸入，Aniya可查油價及匯率！",
-                        "size": "md",
-                        "flex": 5,
-                        "align": "center",
-                        "weight": "bold"
-                    }
-                    ]
-                }
-                ]
-            },
-            {
-                "type": "box",
-                "layout": "vertical",
-                "margin": "lg",
-                "spacing": "sm",
-                "contents": [
-                {
-                    "type": "box",
-                    "layout": "baseline",
-                    "spacing": "sm",
-                    "contents": [
-                    {
-                        "type": "text",
-                        "text": "☸ 今日油價➦輸入➦查詢油價",
-                        "size": "sm",
-                        "flex": 5,
-                        "weight": "bold"
-                    }
-                    ]
-                }
-                ]
-            },
-            {
-                "type": "box",
-                "layout": "vertical",
-                "margin": "lg",
-                "spacing": "sm",
-                "contents": [
-                {
-                    "type": "box",
-                    "layout": "baseline",
-                    "spacing": "sm",
-                    "contents": [
-                    {
-                        "type": "text",
-                        "text": "☸ 今日匯率➦輸入➦查詢匯率",
-                        "size": "sm",
-                        "flex": 5,
-                        "weight": "bold"
-                    }
-                    ]
-                }
-                ]
-            },
-            {
-                "type": "box",
-                "layout": "vertical",
-                "margin": "lg",
-                "spacing": "sm",
-                "contents": [
-                {
-                    "type": "box",
-                    "layout": "baseline",
-                    "spacing": "sm",
-                    "contents": [
-                    {
-                        "type": "text",
-                        "text": "☸ 匯率兌換➦輸入➦換匯USD/TWD/100",
-                        "size": "sm",
-                        "flex": 5,
-                        "weight": "bold"
-                    }
-                    ]
-                }
-                ]
-            }
-            ]
-        },
-        "styles": {
-            "body": {
-            "backgroundColor": "#F8EDED"
-            }
-        }
-    }
-    line_bot_api.reply_message(
-        event.reply_token,
-        FlexSendMessage(alt_text='使用說明', contents=guide_msg)
-    )
+# push_message free 200則/月
 
 @app.route('/callback', methods=['POST'])
 def callback():
@@ -177,8 +22,50 @@ def callback():
     except InvalidSignatureError:
         app.logger.info('Invalid signature. Please check your channel access token/chanel secret.')
         abort(400)
-
     return 'OK'
+
+@handler.add(FollowEvent)
+def handle_follow(event):
+    welcome_msg = Msg_Template.follow_msg()
+    line_bot_api.reply_message(event.reply_token, welcome_msg)
+
+@handler.add(UnfollowEvent)
+def handle_unfollow(event):
+    print(event)
+
+def cache_users_stock():
+    db = mongodb.constructor_stock()
+    nameList = db.list_collection_names()
+    users = []
+    for i in range(len(nameList)):
+        collect = db[nameList[i]]
+        cel = list(collect.find({'tag': 'stock'}))
+        users.append(cel)
+    return users
+
+def push_msg(event, msg):
+    try:
+        user_id = event.source.user_id
+        line_bot_api.push_message(user_id, TextSendMessage(text=msg))
+    except:
+        room_id = event.source.user_id
+        line_bot_api.push_message(room_id, TextSendMessage(text=msg))
+
+def Usage(event):
+    guide_msg = Msg_Template.usage_msg()
+    line_bot_api.reply_message(event.reply_token, guide_msg)
+
+def oil_price():
+    target_url = 'https://gas.goodlife.tw/'
+    rs = requests.session()
+    res = rs.get(target_url, verify=False)
+    res.encoding = 'utf-8'
+    soup = BeautifulSoup(res.text, 'html.parser')
+    title = soup.select('#main')[0].text.replace('\n', '').split("(")[0]
+    gas_price = soup.select('#gas-price')[0].text.replace('\n\n\n', '').replace(' ', '')
+    cpc = soup.select('#cpc')[0].text.replace(' ', '')
+    content = '{}\n{}{}'.format(title, gas_price, cpc)
+    return content
 
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
@@ -200,6 +87,7 @@ def handle_message(event):
             event.reply_token,
             TextSendMessage(text=content)
         )
+    
     if event.message.text == '使用說明':
         Usage(event)
         
@@ -270,15 +158,14 @@ def handle_message(event):
         )
         line_bot_api.reply_message(event.reply_token, message)
 
-    if re.match('財經學堂', msg):
+    if event.message.text == '財經學堂':
         content = Msg_Template.yt_channel()
-        line_bot_api.push_message(uid, content)
-        return 0
+        line_bot_api.reply_message(event.reply_token, content)
 
     #################################### 股票區 ##########################################
 
     if event.message.text == '股價查詢':
-        line_bot_api.push_message(uid, TextSendMessage('請輸入股票代號：#xxxx'))
+        line_bot_api.reply_message(event.reply_token, '請輸入股票代號：#xxxx')
 
     if re.match('關注[0-9]{4}[<>][0-9]', msg):
         stockNumber = msg[2:6]
@@ -377,7 +264,6 @@ def handle_message(event):
             schedule.run_pending()
             time.sleep(1)
 
-
     #################################### 外匯區 ##########################################
 
     if re.match('幣別種類', msg):
@@ -431,137 +317,6 @@ def handle_message(event):
         content = mongodb.delete_my_allcurrency(user_name)
         line_bot_api.push_message(uid, TextSendMessage(content))
         return 0
-
-
-@handler.add(FollowEvent)
-def handle_follow(event):
-    welcome_msg = {
-        "type": "bubble",
-        "hero": {
-            "type": "image",
-            "url": "https://i.imgur.com/NakSo51.jpg",
-            "size": "full",
-            "aspectRatio": "20:13",
-            "aspectMode": "cover",
-            "action": {
-            "type": "uri",
-            "uri": "https://line.me/"
-            }
-        },
-        "body": {
-            "type": "box",
-            "layout": "vertical",
-            "contents": [
-            {
-                "type": "text",
-                "text": "歡迎您成為Aniya Millionaire好友！",
-                "weight": "bold",
-                "size": "md"
-            },
-            {
-                "type": "box",
-                "layout": "vertical",
-                "margin": "lg",
-                "spacing": "sm",
-                "contents": [
-                {
-                    "type": "box",
-                    "layout": "baseline",
-                    "spacing": "sm",
-                    "contents": [
-                    {
-                        "type": "text",
-                        "text": "Aniya是一個機器人，提供最新的財經資訊",
-                        "size": "sm",
-                        "flex": 5,
-                        "align": "center",
-                        "weight": "regular"
-                    }
-                    ]
-                }
-                ]
-            },
-            {
-                "type": "box",
-                "layout": "vertical",
-                "margin": "lg",
-                "spacing": "sm",
-                "contents": [
-                {
-                    "type": "box",
-                    "layout": "baseline",
-                    "spacing": "sm",
-                    "contents": [
-                    {
-                        "type": "text",
-                        "text": "★★ 這裡有 股票、匯率、油價 資訊",
-                        "size": "sm",
-                        "flex": 5
-                    }
-                    ]
-                }
-                ]
-            },
-            {
-                "type": "box",
-                "layout": "vertical",
-                "margin": "lg",
-                "spacing": "sm",
-                "contents": [
-                {
-                    "type": "box",
-                    "layout": "baseline",
-                    "spacing": "sm",
-                    "contents": [
-                    {
-                        "type": "text",
-                        "text": "★★ 直接點選下方【目錄】選單功能",
-                        "size": "sm",
-                        "flex": 5
-                    }
-                    ]
-                }
-                ]
-            },
-            {
-                "type": "box",
-                "layout": "vertical",
-                "margin": "lg",
-                "spacing": "sm",
-                "contents": [
-                {
-                    "type": "box",
-                    "layout": "baseline",
-                    "spacing": "sm",
-                    "contents": [
-                    {
-                        "type": "text",
-                        "text": "期待您的光臨 Waku Waku",
-                        "size": "sm",
-                        "flex": 5,
-                        "align": "center"
-                    }
-                    ]
-                }
-                ]
-            }
-            ]
-        },
-        "styles": {
-            "body": {
-            "backgroundColor": "#FFEEAD"
-            }
-        }
-    }
-
-    line_bot_api.reply_message(
-        event.reply_token,
-        FlexSendMessage(alt_text='歡迎訊息', contents=welcome_msg)
-    )
-
-@handler.add(UnfollowEvent)
-def handle_unfollow(event):
-    print(event)
 
 
 if __name__ == '__main__':
