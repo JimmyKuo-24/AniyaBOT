@@ -165,7 +165,7 @@ def handle_message(event):
     #################################### 股票區 ##########################################
 
     if event.message.text == '股價查詢':
-        line_bot_api.reply_message(event.reply_token, '請輸入股票代號：#xxxx')
+        line_bot_api.reply_message(event.reply_token, TextSendMessage(text='請輸入股票代號：#xxxx'))
 
     if re.match('關注[0-9]{4}[<>][0-9]', msg):
         stockNumber = msg[2:6]
