@@ -125,7 +125,7 @@ def follow_msg():
     return flex_message
 
 def realtime_currency_other(currency):
-    content = "想知道更多?"
+    content = "想知道更多？"
     text_message = TextSendMessage(
                                 text = content ,
                                quick_reply=QuickReply(
