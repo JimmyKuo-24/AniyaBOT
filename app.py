@@ -4,8 +4,7 @@ from linebot.exceptions import (InvalidSignatureError)
 from linebot.models import *
 from line_bot import *
 from bs4 import BeautifulSoup
-import re, twstock, datetime, Msg_Template, mongodb, EXRate
-import requests
+import re, requests, twstock, datetime, Msg_Template, mongodb, EXRate
 
 app = Flask(__name__)
 
@@ -326,21 +325,21 @@ def handle_message(event):
         line_bot_api.push_message(uid, TextSendMessage(content))
         return 0
 
-    if re.match('CT[A-Z]{3}', msg):
-        currency = msg[2:5]
+    if re.match("CT[A-Z]{3}", msg):
+        currency = msg[2:5] # 外幣代號
         if EXRate.getCurrencyName(currency) == "無可支援的外幣":
-            line_bot_api.push_message(uid, TextSendMessage("無可支援的外幣"))
+            line_bot_api.push_message(uid, TextSendMessage('無可支援的外幣'))
             return 0
-        line_bot_api.push_message(uid, TextSendMessage('waiting..., 稍後提供匯率走勢圖...'))
-        cash_imgurl = EXRate.cash_exrate_sixMonth(currency)
-        if cash_imgurl == "無現金匯率可資料分析":
-            line_bot_api.push_message(uid, TextSendMessage("無現金匯率可資料分析"))
+        line_bot_api.push_message(uid, TextSendMessage('稍等一下, 將會給您匯率走勢圖'))
+        cash_imgurl = EXRate.cash_exrate_sixMonth(currency)            
+        if cash_imgurl == "現金匯率無資料可分析":
+            line_bot_api.push_message(uid, TextSendMessage('現金匯率無資料可分析'))
         else:
             line_bot_api.push_message(uid, ImageSendMessage(original_content_url=cash_imgurl, preview_image_url=cash_imgurl))
-
+        
         spot_imgurl = EXRate.spot_exrate_sixMonth(currency)
-        if spot_imgurl == "無即時匯率可資料分析":
-            line_bot_api.push_message(uid, TextSendMessage("無即時匯率可資料分析"))
+        if spot_imgurl == "即期匯率無資料可分析":
+            line_bot_api.push_message(uid, TextSendMessage('即期匯率無資料可分析'))
         else:
             line_bot_api.push_message(uid, ImageSendMessage(original_content_url=spot_imgurl, preview_image_url=spot_imgurl))
         btn_msg = Msg_Template.realtime_currency_other(currency)

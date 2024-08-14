@@ -87,9 +87,9 @@ def cash_exrate_sixMonth(code1):
     currency = currency.iloc[::-1]   # 倒序排列
     if currency['現金買入'][0] == '-' or currency['現金買入'][0] == 0.0:
         return "現金匯率無資料可分析"
-    currency.plot(kind='line', x='Date', y=[u'現金買入', u'現金賣出'], figsize=(12, 6))
+    currency.plot(kind='line', figsize=(12, 6), x='Date', y=[u'現金買入', u'現金賣出'])
     plt.legend(prop=chinese_font)
-    plt.title(f"{currency_name} 6 個月現金匯率趨勢圖", fontsize=20, fontproperties=chinese_font)
+    plt.title(f"{currency_name} 6個月現金匯率趨勢圖", fontsize=20, fontproperties=chinese_font)
     plt.savefig(f'{code1}_cash_exrate_sixMonth.png')
     plt.show()
     plt.close()
@@ -108,9 +108,9 @@ def spot_exrate_sixMonth(code2):
     currency = currency.iloc[::-1]   # 倒序排列
     if currency['即期買入'][0] == '-' or currency['即期買入'][0] == 0.0:
         return "即期匯率無資料可分析"
-    currency.plot(kind='line', x='Date', y=[u'即期買入', u'即期賣出'], figsize=(12, 6))
+    currency.plot(kind='line', figsize=(12, 6), x='Date', y=[u'即期買入', u'即期賣出'])
     plt.legend(prop=chinese_font)
-    plt.title(f"{currency_name} 6 個月即期匯率趨勢圖", fontsize=20, fontproperties=chinese_font)
+    plt.title(f"{currency_name} 6個月即期匯率趨勢圖", fontsize=20, fontproperties=chinese_font)
     plt.savefig(f'{code2}_spot_exrate_sixMonth.png')
     plt.show()
     plt.close()
