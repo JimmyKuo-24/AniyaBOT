@@ -275,12 +275,14 @@ def handle_message(event):
         message = Msg_Template.show_Button()
         line_bot_api.reply_message(event.reply_token, message)
 
-    if re.match('[A-Z]{3}', msg):
+    if re.match('外幣[A-Z]{3}', msg):
         currency_name = EXRate.getCurrencyName(msg)
-        if currency_name == "無可支援的外幣": content = "無可支援的外幣"
+        if currency_name == "無可支援的外幣":
+            content = "無可支援的外幣"
+            line_bot_api.push_message(uid, TextSendMessage(content))
         else:
             line_bot_api.push_message(uid, TextSendMessage('waiting..., 匯率查詢中...'))
-            content = EXRate.showCurrency(msg)
+            content = EXRate.showCurrency(currency)
         line_bot_api.push_message(uid, TextSendMessage(content))
         return 0
 
