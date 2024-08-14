@@ -167,7 +167,7 @@ def handle_message(event):
     if event.message.text == '股價查詢':
         line_bot_api.reply_message(event.reply_token, TextSendMessage(text='請輸入股票代號：#xxxx'))
 
-    if event.message.text == re.match('關注[0-9]{4}[<>][0-9]', msg):
+    if re.match('關注[0-9]{4}[<>][0-9]', msg) == event.message.text:
         stockNumber = msg[2:6]
         content = mongodb.write_my_stock(uid, user_name, stockNumber, msg[6:7], msg[7:])
         line_bot_api.reply_message(event.reply_token, TextSendMessage(content))
@@ -321,6 +321,27 @@ def handle_message(event):
     if re.match('清空外幣', msg):
         content = mongodb.delete_my_allcurrency(user_name)
         line_bot_api.push_message(uid, TextSendMessage(content))
+        return 0
+
+    if re.match('CT[A-Z]{3}', msg):
+        currency = msg[2:5]
+        if EXRate.getCurrencyName(currency) == "無可支援的外幣":
+            line_bot_api.push_message(uid, TextSendMessage("無可支援的外幣"))
+            return 0
+        line_bot_api.push_message(uid, TextSendMessage('waiting..., 稍後提供匯率走勢圖...'))
+        cash_imgurl = EXRate.cash_exrate_sixMonth(currency)
+        if cash_imgurl == "無現金匯率可資料分析":
+            line_bot_api.push_message(uid, TextSendMessage("無現金匯率可資料分析"))
+        else:
+            line_bot_api.push_message(uid, ImageSendMessage(original_content_url=cash_imgurl, preview_image_url=cash_imgurl))
+
+        spot_imgurl = EXRate.spot_exrate_sixMonth(currency)
+        if spot_imgurl == "無即時匯率可資料分析":
+            line_bot_api.push_message(uid, TextSendMessage("無即時匯率可資料分析"))
+        else:
+            line_bot_api.push_message(uid, ImageSendMessage(original_content_url=spot_imgurl, preview_image_url=spot_imgurl))
+        btn_msg = Msg_Template.realtime_currency_other(currency)
+        line_bot_api.push_message(uid, btn_msg)
         return 0
 
 
