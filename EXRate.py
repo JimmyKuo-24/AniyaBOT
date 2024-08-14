@@ -82,13 +82,13 @@ def cash_exrate_sixMonth(code1):
     dfs = pd.read_html(f'https://rate.bot.com.tw/xrt/quote/l6m/{code1}')
     currency = dfs[0].iloc[:, 0:6]
     currency.columns = [u'日期', u'匯率', u'現金買入', u'現金賣出', u'即期買入', u'即期賣出']
+    currency[u'Currency'] = currency[u'Currency'].str.extract('\((\w+)\)')
     currency = currency.iloc[::-1]   # 倒序排列
     if currency['現金買入'][0] == '-' or currency['現金買入'][0] == 0.0:
         return "現金匯率無資料可分析"
     currency.plot(kind='line', x='日期', y=[u'現金買入', u'現金賣出'], figsize=(12, 6), fontsize=12, color=['blue', 'orange'])
     plt.legend(prop=chinese_font)
     plt.title(f"{currency_name} 6 個月現金匯率趨勢圖", fontsize=20, fontproperties=chinese_font)
-    plt.xlabel("日期", fontsize=14, fontproperties=chinese_font)
     plt.savefig(f'{code1}_cash_exrate_sixMonth.png')
     plt.show()
     plt.close()
@@ -103,13 +103,13 @@ def spot_exrate_sixMonth(code2):
     dfs = pd.read_html(f'https://rate.bot.com.tw/xrt/quote/l6m/{code2}')
     currency = dfs[0].iloc[:, 0:6]
     currency.columns = [u'日期', u'匯率', u'現金買入', u'現金賣出', u'即期買入', u'即期賣出']
+    currency[u'Currency'] = currency[u'Currency'].str.extract('\((\w+)\)')
     currency = currency.iloc[::-1]   # 倒序排列
     if currency['即期買入'][0] == '-' or currency['即期買入'][0] == 0.0:
         return "即期匯率無資料可分析"
     currency.plot(kind='line', x='日期', y=[u'即期買入', u'即期賣出'], figsize=(12, 6), fontsize=12, color=['blue', 'orange'])
     plt.legend(prop=chinese_font)
     plt.title(f"{currency_name} 6 個月即期匯率趨勢圖", fontsize=20, fontproperties=chinese_font)
-    plt.xlabel("日期", fontsize=14, fontproperties=chinese_font)
     plt.savefig(f'{code2}_spot_exrate_sixMonth.png')
     plt.show()
     plt.close()
