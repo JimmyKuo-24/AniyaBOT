@@ -4,7 +4,8 @@ from linebot.exceptions import (InvalidSignatureError)
 from linebot.models import *
 from line_bot import *
 from bs4 import BeautifulSoup
-import re, requests, twstock, datetime, Msg_Template, mongodb, EXRate
+import re, twstock, datetime, Msg_Template, mongodb, EXRate
+import requests
 
 app = Flask(__name__)
 

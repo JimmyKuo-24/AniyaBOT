@@ -1,7 +1,8 @@
-import imgur, json, twder, matplotlib, requests, ssl
+import imgur, json, twder, matplotlib, ssl
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
+import requests
 
 from matplotlib.font_manager import FontProperties
 chinese_font = matplotlib.font_manager.FontProperties(fname='msjh.ttf')
@@ -74,42 +75,43 @@ def showCurrency(code):
     return content
 
 def cash_exrate_sixMonth(code1):
-    currency_name = getCurrencyName(code1)# 取得對應的貨幣名稱
+    """
+    現金匯率 6 個月趨勢圖
+    """
+    currency_name = getCurrencyName(code1)
     if currency_name == "無可支援的外幣": return "無可支援的外幣"
     dfs = pd.read_html(f'https://rate.bot.com.tw/xrt/quote/l6m/{code1}')
     currency = dfs[0].iloc[:, 0:6]
-    # 更改欄位名稱
-    currency.columns = [u'Date', u'Currency', u'現金買入', u'現金賣出', u'即期買入',  u'即期賣出']
+    currency.columns = [u'Date', u'Currency', u'現金買入', u'現金賣出', u'即期買入', u'即期賣出']
     currency[u'Currency'] = currency[u'Currency'].str.extract('\((\w+)\)')
-    currency = currency.iloc[::-1] #  row 順序反轉，因原始資料是從最新開始排
-    if currency["現金買入"][0] == "-" or currency["現金買入"][0]== 0.0:
+    currency = currency.iloc[::-1]   # 倒序排列
+    if currency['現金買入'][0] == '-' or currency['現金買入'][0] == 0.0:
         return "現金匯率無資料可分析"
-    currency.plot(kind = 'line', figsize=(12, 6), x='Date', y=[u'現金買入', u'現金賣出'])
-    plt.legend(prop=chinese_font) # 支援中文字
-    plt.title(currency_name + " 現金匯率",  fontsize=20, fontproperties=chinese_font)
-    plt.savefig(f"{code1}.png")
+    currency.plot(kind='line', x='Date', y=[u'現金買入', u'現金賣出'], figsize=(12, 6))
+    plt.legend(prop=chinese_font)
+    plt.title(f"{currency_name} 6 個月現金匯率趨勢圖", fontsize=20, fontproperties=chinese_font)
+    plt.savefig(f'{code1}_cash_exrate_sixMonth.png')
     plt.show()
     plt.close()
     return imgur.showImgur(code1)
 
-##--------------------------------------------
-#######     走勢圖
-#   即期匯率
 def spot_exrate_sixMonth(code2):
-    currency_name = getCurrencyName(code2)# 取得對應的貨幣名稱
+    """
+    即期匯率 6 個月趨勢圖
+    """
+    currency_name = getCurrencyName(code2)
     if currency_name == "無可支援的外幣": return "無可支援的外幣"
     dfs = pd.read_html(f'https://rate.bot.com.tw/xrt/quote/l6m/{code2}')
-    currency = dfs[0].iloc[:, 0:6] # 獲取前6個欄位
-    # 更改欄位名稱
-    currency.columns = [u'Date', u'Currency', u'現金買入', u'現金賣出', u'即期買入',  u'即期賣出']
+    currency = dfs[0].iloc[:, 0:6]
+    currency.columns = [u'Date', u'Currency', u'現金買入', u'現金賣出', u'即期買入', u'即期賣出']
     currency[u'Currency'] = currency[u'Currency'].str.extract('\((\w+)\)')
-    currency = currency.iloc[::-1] #  row 順序反轉，因原始資料是從最新開始排
-    if currency["即期買入"][0] == "-" or currency["即期買入"][0] == 0.0:
+    currency = currency.iloc[::-1]   # 倒序排列
+    if currency['即期買入'][0] == '-' or currency['即期買入'][0] == 0.0:
         return "即期匯率無資料可分析"
-    currency.plot(kind = 'line', figsize=(12, 6),x='Date', y=[u'即期買入', u'即期賣出'])
-    plt.legend(prop=chinese_font) # 支援中文字
-    plt.title(f"{currency_name} 即期匯率",  fontsize=20, fontproperties=chinese_font)
-    plt.savefig(f"{code2}.png")
+    currency.plot(kind='line', x='Date', y=[u'即期買入', u'即期賣出'], figsize=(12, 6))
+    plt.legend(prop=chinese_font)
+    plt.title(f"{currency_name} 6 個月即期匯率趨勢圖", fontsize=20, fontproperties=chinese_font)
+    plt.savefig(f'{code2}_spot_exrate_sixMonth.png')
     plt.show()
     plt.close()
     return imgur.showImgur(code2)
