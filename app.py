@@ -167,7 +167,8 @@ def handle_message(event):
     if event.message.text == '股價查詢':
         line_bot_api.reply_message(event.reply_token, TextSendMessage(text='請輸入股票代號：#xxxx'))
 
-    if event.message.text == re.match('關注[0-9]{4}[<>][0-9]', msg):
+    if re.match('關注[0-9]{4}[<>][0-9]', event.message.text):
+        msg = event.message.text
         stockNumber = msg[2:6]
         content = mongodb.write_my_stock(uid, user_name, stockNumber, msg[6:7], msg[7:])
         line_bot_api.reply_message(event.reply_token, TextSendMessage(content))
