@@ -1,60 +1,39 @@
-import twder
+import imgur, json, requests, twder, matplotlib, ssl
 import pandas as pd
-import requests
-import json
 import matplotlib.pyplot as plt
 import numpy as np
-import matplotlib
-import imgur
-import ssl
+
+from matplotlib.font_manager import FontProperties
+chinese_font = matplotlib.font_manager.FontProperties(fname='msjh.ttf')
+
 ssl._create_default_https_context = ssl._create_unverified_context
 
-from matplotlib.font_manager import FontProperties # 設定字體
-chinese_font = matplotlib.font_manager.FontProperties(fname='msjh.ttf') # 引入同個資料夾下支援中文字檔
-
 def getCurrencyName(currency):
-    currency_list = { 
-        "USD" : "美元",
-        "JPY": "日圓",
-        "HKD" :"港幣",
-        "GBP": "英鎊",
-        "AUD": "澳幣",
-        "CAD" : "加拿大幣",
-        "CHF" : "瑞士法郎",  
-        "SGD" : "新加坡幣",
-        "ZAR" : "南非幣",
-        "SEK" : "瑞典幣",
-        "NZD" : "紐元", 
-        "THB" : "泰幣", 
-        "PHP" : "菲國比索", 
-        "IDR" : "印尼幣", 
-        "KRW" : "韓元",   
-        "MYR" : "馬來幣", 
-        "VND" : "越南盾", 
-        "CNY" : "人民幣",
-      }
-    try: currency_name = currency_list[currency]
-    except: return "無可支援的外幣"
+    currency_list = {
+        'AUD': '澳幣',  
+        'CAD': '加拿大幣',
+        'CHF': '瑞士法郎',
+        'CNY': '人民幣',
+        'EUR': '歐元',
+        'GBP': '英鎊',
+        'HKD': '港幣',
+        'IDR': '印尼盾',
+        'JPY': '日元',
+        'KRW': '韓元',
+        'MYR': '馬來幣',
+        'NZD': '紐元',
+        'PHP': '菲律賓幣',
+        'SEK': '瑞典克朗',
+        'SGD': '新加坡幣',
+        'THB': '泰銖',
+        'USD': '美元',
+        'VND': '越南盾',
+    }
+    try:
+        currency_name = currency_list[currency]
+    except:
+        return "Not Found"
     return currency_name
-# 查詢匯率
-def showCurrency(code): # code 為外幣代碼
-    content = ""
-    currency_name = getCurrencyName(code)
-    if currency_name == "無可支援的外幣": return "無可支援的外幣"
-    # 資料格式 {貨幣代碼: (時間, 現金買入, 現金賣出, 即期買入, 即期賣出), ...}
-    currency = twder.now(code) 
-    # 當下時間
-    now_time = str(currency[0])
-    # 銀行現金買入價格
-    buying_cash = "無資料" if currency[1] == '-' else str(float(currency[1])) 
-    # 銀行現金賣出價格
-    sold_cash = "無資料" if currency[2] == '-' else str(float(currency[2])) 
-    # 銀行即期買入價格
-    buying_spot = "無資料" if currency[3] == '-' else str(float(currency[3])) 
-    # 銀行即期賣出價格
-    sold_spot = "無資料" if currency[4] == '-' else str(float(currency[4])) 
-    content +=  f"{currency_name} 最新掛牌時間為: {now_time}\n ---------- \n 現金買入價格: {buying_cash}\n 現金賣出價格: {sold_cash}\n 即期買入價格: {buying_spot}\n 即期賣出價格: {sold_spot}\n \n"
-    return content
 
 def getExchangeRate(msg): # 不同貨幣直接換算(非只限於台幣)
     """
@@ -74,7 +53,26 @@ def getExchangeRate(msg): # 不同貨幣直接換算(非只限於台幣)
     amount =  float(pd_currency[currency1]) 
     content += str('%.2f' % (amount * float(money_value))) + " " +currency1
     return content
-#  現金匯率
+
+def showCurrency(code): # code 為外幣代碼
+    content = ""
+    currency_name = getCurrencyName(code)
+    if currency_name == "無可支援的外幣": return "無可支援的外幣"
+    # 資料格式 {貨幣代碼: (時間, 現金買入, 現金賣出, 即期買入, 即期賣出), ...}
+    currency = twder.now(code) 
+    # 當下時間
+    now_time = str(currency[0])
+    # 銀行現金買入價格
+    buying_cash = "無資料" if currency[1] == '-' else str(float(currency[1])) 
+    # 銀行現金賣出價格
+    sold_cash = "無資料" if currency[2] == '-' else str(float(currency[2])) 
+    # 銀行即期買入價格
+    buying_spot = "無資料" if currency[3] == '-' else str(float(currency[3])) 
+    # 銀行即期賣出價格
+    sold_spot = "無資料" if currency[4] == '-' else str(float(currency[4])) 
+    content +=  f"{currency_name} 最新掛牌時間為: {now_time}\n ---------- \n 現金買入價格: {buying_cash}\n 現金賣出價格: {sold_cash}\n 即期買入價格: {buying_spot}\n 即期賣出價格: {sold_spot}\n \n"
+    return content
+
 def cash_exrate_sixMonth(code1):
     currency_name = getCurrencyName(code1)# 取得對應的貨幣名稱
     if currency_name == "無可支援的外幣": return "無可支援的外幣"
@@ -94,9 +92,6 @@ def cash_exrate_sixMonth(code1):
     plt.close()
     return imgur.showImgur(code1)
 
-##--------------------------------------------
-#######     走勢圖
-#   即期匯率
 def spot_exrate_sixMonth(code2):
     currency_name = getCurrencyName(code2)# 取得對應的貨幣名稱
     if currency_name == "無可支援的外幣": return "無可支援的外幣"
