@@ -180,7 +180,6 @@ def handle_message(event):
     #     return 0
     
     if re.match('股票清單', event.message.text):
-        line_bot_api.reply_message(event.reply_token, TextSendMessage('waiting..., 股票查詢中...'))
         content = mongodb.show_my_stock(user_name, uid)
         line_bot_api.reply_message(event.reply_token, TextSendMessage(content))
 
