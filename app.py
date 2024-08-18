@@ -189,15 +189,23 @@ def handle_message(event):
     #     line_bot_api.push_message(uid, TextSendMessage(content))
     #     return 0
     
-    if re.match('刪除[0-9]{4}', msg):
+    if re.match('刪除[0-9]{4}', event.message.text):
         content = mongodb.delete_my_stock(user_name, msg[2:])
-        line_bot_api.push_message(uid, TextSendMessage(content))
-        return 0
+        line_bot_api.reply_message(event.reply_token, TextSendMessage(content))
+
+    # if re.match('刪除[0-9]{4}', msg):
+    #     content = mongodb.delete_my_stock(user_name, msg[2:])
+    #     line_bot_api.push_message(uid, TextSendMessage(content))
+    #     return 0
     
-    if re.match('清空股票', msg):
+    if re.match('清空股票', event.message.text):
         content = mongodb.delete_my_allstock(user_name)
-        line_bot_api.push_message(uid, TextSendMessage(content))
-        return 0
+        line_bot_api.reply_message(event.reply_token, TextSendMessage(content))
+
+    # if re.match('清空股票', msg):
+    #     content = mongodb.delete_my_allstock(user_name)
+    #     line_bot_api.push_message(uid, TextSendMessage(content))
+    #     return 0
 
     if (msg.startswith('#')):
         text = msg[1:]
@@ -236,7 +244,7 @@ def handle_message(event):
         import schedule
         schedule.clear()
 
-    if re.match('股價提醒', msg):
+    if re.match('股價提醒', event.message.text):
         import schedule
         import time
         def look_stock_price(stock, condition, price, userID):
@@ -250,17 +258,43 @@ def handle_message(event):
                 content += '\n篩選條件為：<' + price
                 if float(getstock) < float(price):
                     content += '\n符合' + getstock + '<' + price + '的篩選條件'
-                    line_bot_api.push_message(userID, TextSendMessage(text=content))
+                    line_bot_api.reply_message(event.reply_token, TextSendMessage(text=content))
             elif condition == '>':
                 content += '\n篩選條件為：>' + price
                 if float(getstock) > float(price):
                     content += '\n符合' + getstock + '>' + price + '的篩選條件'
-                    line_bot_api.push_message(userID, TextSendMessage(text=content))
+                    line_bot_api.reply_message(event.reply_token, TextSendMessage(text=content))
             elif condition == '=':
                 content += '\n篩選條件為：=' + price
                 if float(getstock) == float(price):
                     content += '\n符合' + getstock + '=' + price + '的篩選條件'
-                    line_bot_api.push_message(userID, TextSendMessage(text=content))
+                    line_bot_api.reply_message(event.reply_token, TextSendMessage(text=content))
+    
+    # if re.match('股價提醒', msg):
+    #     import schedule
+    #     import time
+    #     def look_stock_price(stock, condition, price, userID):
+    #         print(userID)
+    #         url = 'https://tw.stock.yahoo.com/q/q?s=' + stock
+    #         list_req = requests.get(url)
+    #         soup = BeautifulSoup(list_req.content, 'html.parser')
+    #         getstock = soup.find('span', class_='Fz(32px)').string
+    #         content = stock + '當前股價為：' + getstock
+    #         if condition == '<':
+    #             content += '\n篩選條件為：<' + price
+    #             if float(getstock) < float(price):
+    #                 content += '\n符合' + getstock + '<' + price + '的篩選條件'
+    #                 line_bot_api.push_message(userID, TextSendMessage(text=content))
+    #         elif condition == '>':
+    #             content += '\n篩選條件為：>' + price
+    #             if float(getstock) > float(price):
+    #                 content += '\n符合' + getstock + '>' + price + '的篩選條件'
+    #                 line_bot_api.push_message(userID, TextSendMessage(text=content))
+    #         elif condition == '=':
+    #             content += '\n篩選條件為：=' + price
+    #             if float(getstock) == float(price):
+    #                 content += '\n符合' + getstock + '=' + price + '的篩選條件'
+    #                 line_bot_api.push_message(userID, TextSendMessage(text=content))
         
         def job():
             print('HH')
@@ -280,18 +314,28 @@ def handle_message(event):
         message = Msg_Template.show_Button()
         line_bot_api.reply_message(event.reply_token, message)
 
-    if re.match('外幣[A-Z]{3}', msg):
+    if re.match('外幣[A-Z]{3}', event.message.text):
         currency_name = EXRate.getCurrencyName(msg)
         if currency_name == "無可支援的外幣":
             content = "無可支援的外幣"
-            line_bot_api.push_message(uid, TextSendMessage(content))
+            line_bot_api.reply_message(event.reply_token, TextSendMessage(content))
         else:
-            line_bot_api.push_message(uid, TextSendMessage('waiting..., 匯率查詢中...'))
             content = EXRate.showCurrency(currency)
-        line_bot_api.push_message(uid, TextSendMessage(content))
-        return 0
+            line_bot_api.reply_message(event.reply_token, TextSendMessage(content))
 
-    if re.match('新增外幣[A-Z]{3}', msg):
+    # if re.match('外幣[A-Z]{3}', msg):
+    #     currency_name = EXRate.getCurrencyName(msg)
+    #     if currency_name == "無可支援的外幣":
+    #         content = "無可支援的外幣"
+    #         line_bot_api.push_message(uid, TextSendMessage(content))
+    #     else:
+    #         line_bot_api.push_message(uid, TextSendMessage('waiting..., 匯率查詢中...'))
+    #         content = EXRate.showCurrency(currency)
+    #     line_bot_api.push_message(uid, TextSendMessage(content))
+    #     return 0
+
+    if re.match('新增外幣[A-Z]{3}', event.message.text):
+        msg = event.message.text
         currency = msg[4:7]
         currency_name = EXRate.getCurrencyName(currency)
         if currency_name == "無可支援的外幣": content = "無可支援的外幣"
@@ -300,35 +344,68 @@ def handle_message(event):
         else:
             content = mongodb.write_my_currency(uid , user_name, currency, "未設定", "未設定")
         
-        line_bot_api.push_message(uid, TextSendMessage(content))
-        return 0
+        line_bot_api.reply_message(event.reply_token, TextSendMessage(content))
 
-    if re.match('匯率大小事', msg):
+    # if re.match('新增外幣[A-Z]{3}', msg):
+    #     currency = msg[4:7]
+    #     currency_name = EXRate.getCurrencyName(currency)
+    #     if currency_name == "無可支援的外幣": content = "無可支援的外幣"
+    #     elif re.match('新增外幣[A-Z]{3}[<>][0-9]', msg):
+    #         content = mongodb.write_my_currency(uid , user_name, currency, msg[7:8], msg[8:])
+    #     else:
+    #         content = mongodb.write_my_currency(uid , user_name, currency, "未設定", "未設定")
+        
+    #     line_bot_api.push_message(uid, TextSendMessage(content))
+    #     return 0
+
+    if re.match('匯率大小事', event.message.text):
         btn_msg = Msg_Template.stock_reply_rate()
-        line_bot_api.push_message(uid, btn_msg)
-        return 0
+        line_bot_api.reply_message(event.reply_token, btn_msg)
+
+    # if re.match('匯率大小事', msg):
+    #     btn_msg = Msg_Template.stock_reply_rate()
+    #     line_bot_api.push_message(uid, btn_msg)
+    #     return 0
     
-    if re.match('換匯[A-Z]{3}/[A-Z]{3}/[0-9]', msg):
-        line_bot_api.push_message(uid, TextSendMessage('waiting..., 換匯計算中...'))
+    if re.match('換匯[A-Z]{3}/[A-Z]{3}/[0-9]', event.message.text):
+        msg = event.message.text
         content = EXRate.getExchangeRate(msg)
-        line_bot_api.push_message(uid, TextSendMessage(content))
-        return 0
+        line_bot_api.reply_message(event.reply_token, TextSendMessage(content))
+
+    # if re.match('換匯[A-Z]{3}/[A-Z]{3}/[0-9]', msg):
+    #     line_bot_api.push_message(uid, TextSendMessage('waiting..., 換匯計算中...'))
+    #     content = EXRate.getExchangeRate(msg)
+    #     line_bot_api.push_message(uid, TextSendMessage(content))
+    #     return 0
     
-    if re.match('外幣清單', msg):
-        line_bot_api.push_message(uid, TextSendMessage('waiting..., 外幣查詢中...'))
+    if re.match('外幣清單', event.message.text):
         content = mongodb.show_my_currency(uid, user_name)
-        line_bot_api.push_message(uid, TextSendMessage(content))
-        return 0
+        line_bot_api.reply_message(event.reply_token, TextSendMessage(content))
+
+    # if re.match('外幣清單', msg):
+    #     line_bot_api.push_message(uid, TextSendMessage('waiting..., 外幣查詢中...'))
+    #     content = mongodb.show_my_currency(uid, user_name)
+    #     line_bot_api.push_message(uid, TextSendMessage(content))
+    #     return 0
     
     if re.match('刪除外幣[A-Z]{3}', msg):
+        msg = event.message.text
         currency = mongodb.delete_my_currency(user_name, msg[4:7])
-        line_bot_api.push_message(uid, TextSendMessage(currency))
-        return 0
+        line_bot_api.reply_message(event.reply_token, TextSendMessage(currency))
+
+    # if re.match('刪除外幣[A-Z]{3}', msg):
+    #     currency = mongodb.delete_my_currency(user_name, msg[4:7])
+    #     line_bot_api.push_message(uid, TextSendMessage(currency))
+    #     return 0
     
     if re.match('清空外幣', msg):
         content = mongodb.delete_my_allcurrency(user_name)
-        line_bot_api.push_message(uid, TextSendMessage(content))
-        return 0
+        line_bot_api.reply_message(event.reply_token, TextSendMessage(content))
+
+    # if re.match('清空外幣', msg):
+    #     content = mongodb.delete_my_allcurrency(user_name)
+    #     line_bot_api.push_message(uid, TextSendMessage(content))
+    #     return 0
 
     if re.match("CT[A-Z]{3}", msg):
         currency = msg[2:5] # 外幣代號
