@@ -78,18 +78,18 @@ def handle_message(event):
     uid = profile.user_id
     user_name = profile.display_name
 
-    if re.match('hi ai:', event.message.text):
-        client = OpenAI(api_key = 'sk-svcacct-jfZxNfI8mYLTGLASjdh05LI9Lj4fEvDrX5JFxOKXRlTR3_uT3BlbkFJ_iXaQX5amh6N5BYMDO0j64WxbwALMwWbaDaHTkTXg-yHRSgA')
-        response = client.chat.completions.create(
-            model="gpt-3.5-turbo-instruct",
-            max_tokens=256,
-            temperature=0.7,
-            messages=[
-                {"role": "system", "content": "You are a helpful assistant."},
-                {"role": "user", "content": "Hello!"}
-            ],
-        )
-        line_bot_api.reply_message(event.reply_token, TextSendMessage(text=response.choices[0].text.replace('\n', '')))
+    # if re.match('hi ai:', event.message.text):
+    #     client = OpenAI(api_key = 'YOUR_API_KEY')
+    #     response = client.chat.completions.create(
+    #         model="gpt-3.5-turbo-instruct",
+    #         max_tokens=256,
+    #         temperature=0.7,
+    #         messages=[
+    #             {"role": "system", "content": "You are a helpful assistant."},
+    #             {"role": "user", "content": "Hello!"}
+    #         ],
+    #     )
+    #     line_bot_api.reply_message(event.reply_token, TextSendMessage(text=response.choices[0].text.replace('\n', '')))
 
     #################################### 目錄區 ##########################################
 
