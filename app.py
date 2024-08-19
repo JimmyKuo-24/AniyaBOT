@@ -78,15 +78,18 @@ def handle_message(event):
     user_name = profile.display_name
 
     if re.match('hi ai:', event.message.text):
-        openai.api_key = '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'
+        openai.api_key = 'sk-proj-sk-svcacct-OPTxMhoc5wFvUY2F3NwIwN9Y-lNfCPEFvFvnt9kFcnjfAhJT3BlbkFJ3-KtJEJLcAh0XpecDtq1LfnnMBdHuSFQSL_5VBmquyx9rAA'
         msg = event.message.text
         response = openai.Completion.create(
-            engine="text-davinci-003",
+            model="text-davinci-003",
             prompt=msg[6:],
             temperature=0.5,            
             max_tokens=256,
         )
         line_bot_api.reply_message(event.reply_token, TextSendMessage(text=response.choices[0].text.replace('\n', '')))
+    else:
+        reply_msg = 'OpenAI cannot understand your message. Please try again.'
+        line_bot_api.reply_message(event.reply_token, TextSendMessage(text=reply_msg))
 
     #################################### 目錄區 ##########################################
 
