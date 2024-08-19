@@ -80,12 +80,8 @@ def handle_message(event):
 
     if re.match('hi ai:', event.message.text):
         client = OpenAI(api_key ='sk-proj-sk-svcacct-OPTxMhoc5wFvUY2F3NwIwN9Y-lNfCPEFvFvnt9kFcnjfAhJT3BlbkFJ3-KtJEJLcAh0XpecDtq1LfnnMBdHuSFQSL_5VBmquyx9rAA')
-        msg = event.message.text
         response = client.chat.completions.create(
             model="gpt-3.5-turbo",
-            prompt=msg[6:],
-            temperature=0.5,            
-            max_tokens=256,
             messages=[
                 {"role": "system", "content": "You are a helpful assistant."},
                 {"role": "user", "content": "Hello!"}
