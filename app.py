@@ -4,7 +4,8 @@ from linebot.exceptions import (InvalidSignatureError)
 from linebot.models import *
 from line_bot import *
 from bs4 import BeautifulSoup
-import re, requests, twstock, datetime, Msg_Template, mongodb, EXRate, openai
+import re, requests, twstock, datetime, Msg_Template, mongodb, EXRate
+from openai import OpenAI
 
 app = Flask(__name__)
 
@@ -78,9 +79,9 @@ def handle_message(event):
     user_name = profile.display_name
 
     if re.match('hi ai:', event.message.text):
-        openai.api_key = 'sk-proj-sk-svcacct-OPTxMhoc5wFvUY2F3NwIwN9Y-lNfCPEFvFvnt9kFcnjfAhJT3BlbkFJ3-KtJEJLcAh0XpecDtq1LfnnMBdHuSFQSL_5VBmquyx9rAA'
+        client = OpenAI(api_key ='sk-proj-sk-svcacct-OPTxMhoc5wFvUY2F3NwIwN9Y-lNfCPEFvFvnt9kFcnjfAhJT3BlbkFJ3-KtJEJLcAh0XpecDtq1LfnnMBdHuSFQSL_5VBmquyx9rAA')
         msg = event.message.text
-        response = openai.Completion.create(
+        response = client.chat.completions.create(
             model="text-davinci-003",
             prompt=msg[6:],
             temperature=0.5,            
