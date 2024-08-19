@@ -4,7 +4,7 @@ from linebot.exceptions import (InvalidSignatureError)
 from linebot.models import *
 from line_bot import *
 from bs4 import BeautifulSoup
-import re, requests, twstock, datetime, Msg_Template, mongodb, EXRate
+import re, requests, twstock, datetime, Msg_Template, mongodb, EXRate, openai
 
 app = Flask(__name__)
 
@@ -69,15 +69,27 @@ def oil_price():
 
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
-    # line_bot_api.reply_message(
-    #     event.reply_token,
-    #     TextSendMessage(text=event.message.text))
+    # line_bot_api.reply_message(event.reply_token, TextSendMessage(text=event.message.text))
     msg = str(event.message.text).upper().strip()
     profile = line_bot_api.get_profile(event.source.user_id)
 
     usespeak = str(event.message.text)
     uid = profile.user_id
     user_name = profile.display_name
+
+    if re.match('hi ai:', event.message.text):
+        openai.api_key = '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'
+        msg = event.message.text
+        response = openai.Completion.create(
+            engine="text-davinci-003",
+            prompt=msg[6:],
+            temperature=0.5,            
+            max_tokens=256,
+        )
+        line_bot_api.reply_message(event.reply_token, TextSendMessage(text=response.choices[0].text.replace('\n', '')))
+    else:
+        reply_msg = 'OpenAI cant find this command, please type "hi ai:" to use AI assistant.'
+        line_bot_api.reply_message(event.reply_token, TextSendMessage(text=reply_msg))
 
     #################################### 目錄區 ##########################################
 
