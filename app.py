@@ -81,7 +81,7 @@ def handle_message(event):
     if re.match('hi ai:', event.message.text):
         client = OpenAI(api_key = 'sk-svcacct-jfZxNfI8mYLTGLASjdh05LI9Lj4fEvDrX5JFxOKXRlTR3_uT3BlbkFJ_iXaQX5amh6N5BYMDO0j64WxbwALMwWbaDaHTkTXg-yHRSgA')
         response = client.chat.completions.create(
-            model="gpt-3.5-turbo",
+            model="gpt-3.5-turbo-instruct",
             max_tokens=256,
             temperature=0.7,
             messages=[
