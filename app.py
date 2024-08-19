@@ -87,9 +87,6 @@ def handle_message(event):
             max_tokens=256,
         )
         line_bot_api.reply_message(event.reply_token, TextSendMessage(text=response.choices[0].text.replace('\n', '')))
-    else:
-        reply_msg = 'OpenAI cannot understand your message. Please try again.'
-        line_bot_api.reply_message(event.reply_token, TextSendMessage(text=reply_msg))
 
     #################################### 目錄區 ##########################################
 
