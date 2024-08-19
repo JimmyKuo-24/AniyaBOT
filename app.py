@@ -79,7 +79,7 @@ def handle_message(event):
     user_name = profile.display_name
 
     if re.match('hi ai:', event.message.text):
-        client = OpenAI(api_key ='sk-proj-sk-svcacct-OPTxMhoc5wFvUY2F3NwIwN9Y-lNfCPEFvFvnt9kFcnjfAhJT3BlbkFJ3-KtJEJLcAh0XpecDtq1LfnnMBdHuSFQSL_5VBmquyx9rAA')
+        client = OpenAI(api_key = 'sk-svcacct-jfZxNfI8mYLTGLASjdh05LI9Lj4fEvDrX5JFxOKXRlTR3_uT3BlbkFJ_iXaQX5amh6N5BYMDO0j64WxbwALMwWbaDaHTkTXg-yHRSgA')
         response = client.chat.completions.create(
             model="gpt-3.5-turbo",
             messages=[
