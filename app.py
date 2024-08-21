@@ -141,8 +141,8 @@ def handle_message(event):
                                 uri='https://www.macromicro.me/charts/49426/mei-yuan-tai-bi-hui-lyu-vs-tai-wan-jia-quan-zhi-shu'
                             ),
                             URIAction(
-                                label='youtube 小Lin說',
-                                uri='https://www.youtube.com/@xiao_lin_shuo'
+                                label='youtube 小翠時政財經',
+                                uri='https://liff.line.me/2006134064-X1yPGZyA'
                             )
                         ]
                     ),
