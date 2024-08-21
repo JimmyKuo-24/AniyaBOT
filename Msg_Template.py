@@ -412,6 +412,35 @@ def show_Button():
     )
     return flex_message
 
+def stock_reply_other():
+    content_text = "分析趨勢圖"
+    text_message = TextSendMessage(
+        text = content_text ,
+        quick_reply=QuickReply(
+            items=[
+                    QuickReplyButton(
+                            action=MessageAction(
+                                label="💜股價查詢💜", 
+                                text="輸入：#xxxx",
+                            )
+                    ),
+                    QuickReplyButton(
+                            action=MessageAction(
+                                label="💜匯率趨勢💜", 
+                                text="輸入：CTUSD",
+                            )
+                    ),
+                    QuickReplyButton(
+                            action=MessageAction(
+                                label="💜股價K線圖💜",  
+                                text="輸入：@K23302024-08-01",
+                            )
+                    )
+            ]
+        )
+    )
+    return text_message
+
 def stock_reply_rate():
     content_text = "想知道匯率？"
     text_message = TextSendMessage(

@@ -125,6 +125,10 @@ def handle_message(event):
     
     if event.message.text == '使用說明':
         Usage(event)
+
+    if event.message.text == '分析趨勢圖':
+        message = Msg_Template.stock_reply_other()
+        line_bot_api.reply_message(event.reply_token, message)
         
     if event.message.text == 'Aniya':
         message = TemplateSendMessage(
