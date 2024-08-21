@@ -4,10 +4,11 @@ from linebot.exceptions import (InvalidSignatureError)
 from linebot.models import *
 from line_bot import *
 from bs4 import BeautifulSoup
-import re, requests, twstock, datetime, Msg_Template, mongodb, EXRate
+import re, requests, twstock, datetime, Msg_Template, mongodb, EXRate, yfinance as yf, mplfinance as mpf, pyimgur
 from openai import OpenAI
 
 app = Flask(__name__)
+IMGUR_CLIENT_ID = '377a9d38e49c276'
 
 # push_message free 200則/月
 
@@ -67,6 +68,28 @@ def oil_price():
     cpc = soup.select('#cpc')[0].text.replace(' ', '')
     content = '{}\n{}{}'.format(title, gas_price, cpc)
     return content
+
+def plot_stock_k_chart(IMGUR_CLIENT_ID, stock='0050', date_from='2021-01-01'):
+    stock = str(stock) + '.TW'
+    try:
+        print(f'正在獲取股票數據: {stock}')
+        df = yf.download(stock, start=date_from)
+
+        if df is None or df.empty:
+            print(f'股票數據: {stock} 無法取得')
+            return None
+
+        print(f'正在繪製股票K線圖: {stock}')
+        mpf.plot(df, type='candle', mav=(5, 20), volume=True, ylabel=stock.upper() + 'Price', savefig=f'{stock}.png')
+
+        PATH = f'{stock}.png'
+        im = pyimgur.Imgur(IMGUR_CLIENT_ID)
+        uploaded_image = im.upload_image(PATH, title=f'{stock} K-Chart')
+        print(f'已上傳圖片: {uploaded_image.link}')
+        return uploaded_image.link
+    except Exception as e:
+        print(f'錯誤: {e}')
+        return None
 
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
@@ -319,6 +342,17 @@ def handle_message(event):
         while True: 
             schedule.run_pending()
             time.sleep(1)
+
+    if event.message.text[:2].upper() == '@K':
+        input_word = event.message.text.replace(' ', '')
+        stock_name = input_word[2:6]
+        start_date = input_word[6:]
+        content = plot_stock_k_chart(IMGUR_CLIENT_ID, stock_name, start_date)
+        message = ImageSendMessage(
+            original_content_url=content,
+            preview_image_url=content
+        )
+        line_bot_api.reply_message(event.reply_token, message)
 
     #################################### 外匯區 ##########################################
 
