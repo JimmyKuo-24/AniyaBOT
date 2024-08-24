@@ -94,7 +94,7 @@ def Usage(event):
     
 def volume0000():
     rs0 = requests.session()
-    res = rs0.get('https://www.twse.com.tw/rwd/zh/afterTrading/MI_INDEX?response=html')
+    res = rs0.get('https://www.twse.com.tw/rwd/zh/afterTrading/MI_INDEX?response=html', verify=False)
     res.encoding = 'utf8'
     soup = BeautifulSoup(res.text, 'html.parser')
     date = soup.find_all('th')[0].text[:11].replace('\n','')
@@ -103,8 +103,8 @@ def volume0000():
     return date, volume_0000
 
 def II3():   # institutional investors 三大法人
-    rs1 = requests.session()
-    res = rs1.get('https://www.twse.com.tw/rwd/zh/fund/BFI82U?response=html')
+    rs = requests.session()
+    res = rs.get('https://www.twse.com.tw/rwd/zh/fund/BFI82U?response=html', verify=False)
     res.encoding = 'utf8'
     soup = BeautifulSoup(res.text, 'html.parser')
     
@@ -117,8 +117,8 @@ def II3():   # institutional investors 三大法人
     return foreign_investors, investment_trust, DEALER
 
 def FI_futures():
-    rs2 = requests.session()
-    res = rs2.get('https://www.taifex.com.tw/cht/3/futContractsDate')
+    rs = requests.session()
+    res = rs.get('https://www.taifex.com.tw/cht/3/futContractsDate', verify=False)
     res.encoding = 'utf8'
     soup = BeautifulSoup(res.text, 'html.parser')
     big = soup.find_all('td')[39].text.replace(',','')
@@ -129,8 +129,8 @@ def FI_futures():
     return LOTS
 
 def futures_large():
-    rs3 = requests.session()
-    res = rs3.get('https://www.taifex.com.tw/cht/3/largeTraderFutQry')
+    rs = requests.session()
+    res = rs.get('https://www.taifex.com.tw/cht/3/largeTraderFutQry', verify=False)
     res.encoding = 'utf8'
     soup = BeautifulSoup(res.text, 'html.parser')
     B5 = soup.find_all('td')[22].text.replace(',','').split()
@@ -143,8 +143,8 @@ def futures_large():
     return large5, large10
 
 def PCR():
-    rs4 = requests.session()
-    res = rs4.get('https://www.taifex.com.tw/cht/3/pcRatio')
+    rs = requests.session()
+    res = rs.get('https://www.taifex.com.tw/cht/3/pcRatio', verify=False)
     res.encoding = 'utf8'
     soup = BeautifulSoup(res.text, 'html.parser')
     pcr = eval(soup.find_all('td')[6].text)
@@ -152,8 +152,8 @@ def PCR():
     return pcr
 
 def putcall():
-    rs5 = requests.session()
-    res = rs5.get('https://www.taifex.com.tw/cht/3/callsAndPutsDate')
+    rs = requests.session()
+    res = rs.get('https://www.taifex.com.tw/cht/3/callsAndPutsDate', verify=False)
     res.encoding = 'utf8'
     soup = BeautifulSoup(res.text, 'html.parser')
     fcall = soup.find_all('td')[41].text.replace(',','').split()
@@ -166,7 +166,7 @@ def putcall():
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
     # line_bot_api.reply_message(event.reply_token, TextSendMessage(text=event.message.text))
-    msg = str(event.message.text).upper().strip()
+    msg = str(event.message.text).strip()
     profile = line_bot_api.get_profile(event.source.user_id)
 
     usespeak = str(event.message.text)
