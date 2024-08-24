@@ -132,19 +132,19 @@ def realtime_currency_other(currency):
                                    items=[
                                        QuickReplyButton(
                                                 action=MessageAction(
-                                                    label="即時匯率", 
+                                                    label="💰💰掛牌匯率", 
                                                     text="匯率查詢"+currency,
                                                 )
                                        ),
                                        QuickReplyButton(
                                                 action=MessageAction(
-                                                    label="加入清單", 
+                                                    label="💰💰加入清單", 
                                                     text="新增外幣"+currency,
                                                 )
                                        ),
                                         QuickReplyButton(
                                                 action=MessageAction(
-                                                    label="趨勢圖", 
+                                                    label="💰💰6個月趨勢圖", 
                                                     text="CT"+currency,
                                                 )
                                        ),
@@ -443,19 +443,19 @@ def stock_reply_rate():
             items=[
                     QuickReplyButton(
                             action=MessageAction(
-                                label="💜💜查詢美元匯率", 
+                                label="✈️查詢美元匯率✈️", 
                                 text="匯率查詢USD",
                             )
                     ),
                     QuickReplyButton(
                             action=MessageAction(
-                                label="💜💜查詢日元匯率", 
+                                label="✈️查詢日元匯率✈️", 
                                 text="匯率查詢JPY",
                             )
                     ),
                     QuickReplyButton(
                             action=MessageAction(
-                                label="💜💜查詢韓元匯率", 
+                                label="✈️查詢韓元匯率✈️", 
                                 text="匯率查詢KRW",
                             )
                     )

@@ -347,11 +347,11 @@ def handle_message(event):
     #     return 0
     
     if re.match('清空股票', msg):
-        content = mongodb.delete_my_allstock(user_name)
+        content = mongodb.delete_my_allstock(user_name, uid)
         line_bot_api.reply_message(event.reply_token, TextSendMessage(content))
 
     # if re.match('清空股票', msg):
-    #     content = mongodb.delete_my_allstock(user_name)
+    #     content = mongodb.delete_my_allstock(user_name, uid)
     #     line_bot_api.push_message(uid, TextSendMessage(content))
     #     return 0
 
@@ -539,11 +539,11 @@ def handle_message(event):
     #     return 0
     
     if re.match('清空外幣', msg):
-        content = mongodb.delete_my_allcurrency(user_name)
+        content = mongodb.delete_my_allcurrency(user_name, uid)
         line_bot_api.reply_message(event.reply_token, TextSendMessage(content))
 
     # if re.match('清空外幣', msg):
-    #     content = mongodb.delete_my_allcurrency(user_name)
+    #     content = mongodb.delete_my_allcurrency(user_name, uid)
     #     line_bot_api.push_message(uid, TextSendMessage(content))
     #     return 0
 
@@ -552,7 +552,7 @@ def handle_message(event):
         if EXRate.getCurrencyName(currency) == "無可支援的外幣":
             line_bot_api.push_message(uid, TextSendMessage('無可支援的外幣'))
             return 0
-        line_bot_api.push_message(uid, TextSendMessage('稍等一下, 將會給您匯率走勢圖'))
+        line_bot_api.push_message(uid, TextSendMessage('請稍等，匯率趨勢圖生成中'))
         cash_imgurl = EXRate.cash_exrate_sixMonth(currency)            
         if cash_imgurl == "現金匯率無資料可分析":
             line_bot_api.push_message(uid, TextSendMessage('現金匯率無資料可分析'))
