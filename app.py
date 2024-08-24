@@ -95,15 +95,18 @@ def Usage(event):
 def volume0000():
     rs = requests.session()
     res = rs.get('https://www.twse.com.tw/rwd/zh/afterTrading/MI_INDEX?response=html')
+    time.sleep(1)
     res.encoding = 'utf8'
     soup = BeautifulSoup(res.text, 'html.parser')
+    date = soup.find_all('th')[0].text[:11].replace('\n','')
     volume_0000 = round(int(soup.find_all('td')[-18].text.replace(',',''))/10**8)
     
-    return volume_0000
+    return date, volume_0000
 
 def II3():   # institutional investors 三大法人
     rs = requests.session()
     res = rs.get('https://www.twse.com.tw/rwd/zh/fund/BFI82U?response=html')
+    time.sleep(1)
     res.encoding = 'utf8'
     soup = BeautifulSoup(res.text, 'html.parser')
     
@@ -118,6 +121,7 @@ def II3():   # institutional investors 三大法人
 def FI_futures():
     rs = requests.session()
     res = rs.get('https://www.taifex.com.tw/cht/3/futContractsDate')
+    time.sleep(1)
     res.encoding = 'utf8'
     soup = BeautifulSoup(res.text, 'html.parser')
     big = soup.find_all('td')[39].text.replace(',','')
@@ -130,6 +134,7 @@ def FI_futures():
 def futures_large():
     rs = requests.session()
     res = rs.get('https://www.taifex.com.tw/cht/3/largeTraderFutQry')
+    time.sleep(1)
     res.encoding = 'utf8'
     soup = BeautifulSoup(res.text, 'html.parser')
     B5 = soup.find_all('td')[22].text.replace(',','').split()
@@ -144,6 +149,7 @@ def futures_large():
 def PCR():
     rs = requests.session()
     res = rs.get('https://www.taifex.com.tw/cht/3/pcRatio')
+    time.sleep(1)
     res.encoding = 'utf8'
     soup = BeautifulSoup(res.text, 'html.parser')
     pcr = eval(soup.find_all('td')[6].text)
@@ -153,6 +159,7 @@ def PCR():
 def putcall():
     rs = requests.session()
     res = rs.get('https://www.taifex.com.tw/cht/3/callsAndPutsDate')
+    time.sleep(1)
     res.encoding = 'utf8'
     soup = BeautifulSoup(res.text, 'html.parser')
     fcall = soup.find_all('td')[41].text.replace(',','').split()
@@ -434,14 +441,14 @@ def handle_message(event):
         line_bot_api.reply_message(event.reply_token, message)
 
     if re.match('先行指標', msg):
-        volume_0000 = volume0000()
+        date, volume_0000 = volume0000()
         foreign_investors, investment_trust, DEALER = II3()
         LOTS = FI_futures()
         large5, large10 = futures_large()
         pcr = PCR()
         FPC = putcall()
 
-        content = f'日期：{datetime.datetime.today().strftime("%Y-%m-%d")}\n'
+        content = f'日期：{date}\n'
         content += f'成交量(億元)：{volume_0000}\n外資(億元)：{foreign_investors}\n投信(億元)：{investment_trust}\n自營(億元)：{DEALER}\n'
         content += f'外資期貨留倉(口)：{LOTS}\n前五大留倉(口)：{large5}\n前十大留倉(口)：{large10}\n'
         content += f'PCR：{pcr}\n外資選擇權留倉(億元)：{FPC}'
