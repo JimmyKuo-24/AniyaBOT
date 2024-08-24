@@ -4,7 +4,7 @@ from linebot.exceptions import (InvalidSignatureError)
 from linebot.models import *
 from line_bot import *
 from bs4 import BeautifulSoup
-import re, requests, twstock, datetime, Msg_Template, mongodb, EXRate, yfinance as yf, mplfinance as mpf, pyimgur
+import datetime, EXRate, re, requests, schedule, time, twstock, mongodb, mplfinance as mpf, Msg_Template, pyimgur, yfinance as yf
 from openai import OpenAI
 
 app = Flask(__name__)
@@ -45,18 +45,6 @@ def cache_users_stock():
         users.append(cel)
     return users
 
-def push_msg(event, msg):
-    try:
-        user_id = event.source.user_id
-        line_bot_api.push_message(user_id, TextSendMessage(text=msg))
-    except:
-        room_id = event.source.user_id
-        line_bot_api.push_message(room_id, TextSendMessage(text=msg))
-
-def Usage(event):
-    guide_msg = Msg_Template.usage_msg()
-    line_bot_api.reply_message(event.reply_token, guide_msg)
-
 def oil_price():
     target_url = 'https://gas.goodlife.tw/'
     rs = requests.session()
@@ -91,6 +79,89 @@ def plot_stock_k_chart(IMGUR_CLIENT_ID, stock='0050', date_from='2021-01-01'):
         print(f'錯誤: {e}')
         return None
 
+def push_msg(event, msg):
+    try:
+        user_id = event.source.user_id
+        line_bot_api.push_message(user_id, TextSendMessage(text=msg))
+    except:
+        room_id = event.source.user_id
+        line_bot_api.push_message(room_id, TextSendMessage(text=msg))
+
+def Usage(event):
+    guide_msg = Msg_Template.usage_msg()
+    line_bot_api.reply_message(event.reply_token, guide_msg)
+
+    
+def volume0000():
+    rs = requests.session()
+    res = rs.get('https://www.twse.com.tw/rwd/zh/afterTrading/MI_INDEX?response=html')
+    res.encoding = 'utf8'
+    soup = BeautifulSoup(res.text, 'html.parser')
+    volume_0000 = round(int(soup.find_all('td')[-18].text.replace(',',''))/10**8)
+    
+    return volume_0000
+
+def II3():   # institutional investors 三大法人
+    rs = requests.session()
+    res = rs.get('https://www.twse.com.tw/rwd/zh/fund/BFI82U?response=html')
+    res.encoding = 'utf8'
+    soup = BeautifulSoup(res.text, 'html.parser')
+    
+    foreign_investors = round(int(soup.find_all('td')[15].text.replace(',',''))/10**8)
+    investment_trust = round(int(soup.find_all('td')[11].text.replace(',',''))/10**8)
+    dealer = int(soup.find_all('td')[3].text.replace(',',''))/10**8
+    dealer_hedge = int(soup.find_all('td')[7].text.replace(',',''))/10**8
+    DEALER = round(dealer + dealer_hedge)
+
+    return foreign_investors, investment_trust, DEALER
+
+def FI_futures():
+    rs = requests.session()
+    res = rs.get('https://www.taifex.com.tw/cht/3/futContractsDate')
+    res.encoding = 'utf8'
+    soup = BeautifulSoup(res.text, 'html.parser')
+    big = soup.find_all('td')[39].text.replace(',','')
+    small = soup.find_all('td')[162].text.replace(',','')
+    micro = soup.find_all('td')[203].text.replace(',','')
+    LOTS = round(int(big) + int(small)/4 + int(micro)/20)
+    
+    return LOTS
+
+def futures_large():
+    rs = requests.session()
+    res = rs.get('https://www.taifex.com.tw/cht/3/largeTraderFutQry')
+    res.encoding = 'utf8'
+    soup = BeautifulSoup(res.text, 'html.parser')
+    B5 = soup.find_all('td')[22].text.replace(',','').split()
+    S5 = soup.find_all('td')[26].text.replace(',','').split()
+    large5 = int(B5[0]) - int(S5[0])
+    B10 = soup.find_all('td')[24].text.replace(',','').split()
+    S10 = soup.find_all('td')[28].text.replace(',','').split()
+    large10 = int(B10[0]) - int(S10[0])
+
+    return large5, large10
+
+def PCR():
+    rs = requests.session()
+    res = rs.get('https://www.taifex.com.tw/cht/3/pcRatio')
+    res.encoding = 'utf8'
+    soup = BeautifulSoup(res.text, 'html.parser')
+    pcr = eval(soup.find_all('td')[6].text)
+    
+    return pcr
+
+def putcall():
+    rs = requests.session()
+    res = rs.get('https://www.taifex.com.tw/cht/3/callsAndPutsDate')
+    res.encoding = 'utf8'
+    soup = BeautifulSoup(res.text, 'html.parser')
+    fcall = soup.find_all('td')[41].text.replace(',','').split()
+    fput = soup.find_all('td')[81].text.replace(',','').split()
+    FPC = (int(fcall[0]) - int(fput[0]))/10**5
+
+    return FPC
+
+
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
     # line_bot_api.reply_message(event.reply_token, TextSendMessage(text=event.message.text))
@@ -115,22 +186,11 @@ def handle_message(event):
     #     line_bot_api.reply_message(event.reply_token, TextSendMessage(text=response.choices[0].text.replace('\n', '')))
 
     #################################### 目錄區 ##########################################
-
-    if event.message.text == '油價查詢':
-        content = oil_price()
-        line_bot_api.reply_message(
-            event.reply_token,
-            TextSendMessage(text=content)
-        )
     
-    if event.message.text == '使用說明':
+    if msg == '使用說明':
         Usage(event)
-
-    if event.message.text == '分析趨勢圖':
-        message = Msg_Template.stock_reply_other()
-        line_bot_api.reply_message(event.reply_token, message)
         
-    if event.message.text == 'Aniya':
+    if msg == 'Aniya':
         message = TemplateSendMessage(
         alt_text='目錄 template',
         template=CarouselTemplate(
@@ -156,12 +216,12 @@ def handle_message(event):
                     ),
                 CarouselColumn(
                         thumbnail_image_url='https://i.imgur.com/rwR2yUr.jpg',
-                        title='外匯專區',
+                        title='匯率專區',
                         text='選擇服務',
                         actions=[
                             URIAction(
                                 label='臺銀匯率',
-                                uri='https://rate.bot.com.tw/xrt?Lang=zh-Tw'
+                                uri='https://liff.line.me/2006134064-X1yPGZyA'
                             ),
                             URIAction(
                                 label='匯率與指數',
@@ -169,7 +229,7 @@ def handle_message(event):
                             ),
                             URIAction(
                                 label='youtube 小翠時政財經',
-                                uri='https://liff.line.me/2006134064-X1yPGZyA'
+                                uri='https://www.youtube.com/channel/UCOhck8oLoIwSJzmwYMXsSnQ'
                             )
                         ]
                     ),
@@ -197,57 +257,28 @@ def handle_message(event):
         )
         line_bot_api.reply_message(event.reply_token, message)
 
-    if event.message.text == '財經學堂':
+    if msg == '油價查詢':
+        content = oil_price()
+        line_bot_api.reply_message(event.reply_token, TextSendMessage(text=content))
+    
+    if msg == '財經學堂':
         content = Msg_Template.yt_channel()
         line_bot_api.reply_message(event.reply_token, content)
 
     #################################### 股票區 ##########################################
 
-    if event.message.text == '股價查詢':
-        line_bot_api.reply_message(event.reply_token, TextSendMessage(text='請輸入股票代號：#xxxx'))
+    # if msg == '分析趨勢':
+    #     message = Msg_Template.stock_reply_other()
+    #     line_bot_api.reply_message(event.reply_token, message)
 
-    if re.match('關注[0-9]{4}[<>][0-9]', event.message.text):
-        msg = event.message.text
-        stockNumber = msg[2:6]
-        content = mongodb.write_my_stock(uid, user_name, stockNumber, msg[6:7], msg[7:])
-        line_bot_api.reply_message(event.reply_token, TextSendMessage(content))
+    if msg == '股價查詢':
+        line_bot_api.reply_message(event.reply_token, TextSendMessage(text='請輸入：#股票代號'))
 
-    # if re.match('關注[0-9]{4}[<>][0-9]', msg):
-    #     stockNumber = msg[2:6]
-    #     content = mongodb.write_my_stock(uid, user_name, stockNumber, msg[6:7], msg[7:])
-    #     line_bot_api.push_message(uid, TextSendMessage(content))
-    #     return 0
-    
-    if re.match('股票清單', event.message.text):
-        content = mongodb.show_my_stock(user_name, uid)
-        line_bot_api.reply_message(event.reply_token, TextSendMessage(content))
-
-    # if re.match('股票清單', msg):
-    #     line_bot_api.push_message(uid, TextSendMessage('waiting..., 股票查詢中...'))
-    #     content = mongodb.show_my_stock(user_name, uid)
-    #     line_bot_api.push_message(uid, TextSendMessage(content))
-    #     return 0
-    
-    if re.match('刪除[0-9]{4}', event.message.text):
-        content = mongodb.delete_my_stock(user_name, msg[2:])
-        line_bot_api.reply_message(event.reply_token, TextSendMessage(content))
-
-    # if re.match('刪除[0-9]{4}', msg):
-    #     content = mongodb.delete_my_stock(user_name, msg[2:])
-    #     line_bot_api.push_message(uid, TextSendMessage(content))
-    #     return 0
-    
-    if re.match('清空股票', event.message.text):
-        content = mongodb.delete_my_allstock(user_name)
-        line_bot_api.reply_message(event.reply_token, TextSendMessage(content))
-
-    # if re.match('清空股票', msg):
-    #     content = mongodb.delete_my_allstock(user_name)
-    #     line_bot_api.push_message(uid, TextSendMessage(content))
-    #     return 0
-
-    if (msg.startswith('#')):
-        text = msg[1:]
+    if msg.startswith('#'):
+        if msg[1:6].isdigit():
+            text=msg[1:6]
+        else:
+            text=msg[1:5]
         content = ''
 
         stock_rt = twstock.realtime.get(text)
@@ -272,20 +303,61 @@ def handle_message(event):
         price5 = stock.price[-5:][::-1]
         date5 = stock.date[-5:][::-1]
         for i in range(len(price5)):
-            #content += '[%s] %s\n' %(date5[i].strftime("%Y-%m-%d %H:%M:%S"), price5[i])
+            # content += '[%s] %s\n' %(date5[i].strftime("%Y-%m-%d %H:%M:%S"), price5[i])
             content += '[%s] %s\n' %(date5[i].strftime("%Y-%m-%d"), price5[i])
-        line_bot_api.reply_message(
-            event.reply_token,
-            TextSendMessage(text=content)
-        )
+
+        line_bot_api.reply_message(event.reply_token, TextSendMessage(text=content))
+
+    if re.match('關注[0-9]{4}[<=>][0-9]', msg):
+        stockNumber = msg[2:6]
+        content = mongodb.write_my_stock(uid, user_name, stockNumber, msg[6:7], msg[7:])
+        line_bot_api.reply_message(event.reply_token, TextSendMessage(content))
+    elif re.match('關注[0-9]{5}[<=>][0-9]', msg):
+        stockNumber = msg[2:7]
+        content = mongodb.write_my_stock(uid, user_name, stockNumber, msg[7:8], msg[8:])
+        line_bot_api.reply_message(event.reply_token, TextSendMessage(content))
+
+    # if re.match('關注[0-9]{4}[<>][0-9]', msg):
+    #     stockNumber = msg[2:6]
+    #     content = mongodb.write_my_stock(uid, user_name, stockNumber, msg[6:7], msg[7:])
+    #     line_bot_api.push_message(uid, TextSendMessage(content))
+    #     return 0
+    
+    if re.match('股票清單', msg):
+        content = mongodb.show_my_stock(user_name, uid)
+        line_bot_api.reply_message(event.reply_token, TextSendMessage(content))
+
+    # if re.match('股票清單', msg):
+    #     line_bot_api.push_message(uid, TextSendMessage('waiting..., 股票查詢中...'))
+    #     content = mongodb.show_my_stock(user_name, uid)
+    #     line_bot_api.push_message(uid, TextSendMessage(content))
+    #     return 0
+    
+    if re.match('刪除[0-9]{4}', msg):
+        content = mongodb.delete_my_stock(user_name, msg[2:])
+        line_bot_api.reply_message(event.reply_token, TextSendMessage(content))
+    elif re.match('刪除[0-9]{5}', msg):
+        content = mongodb.delete_my_stock(user_name, msg[2:])
+        line_bot_api.reply_message(event.reply_token, TextSendMessage(content))
+
+    # if re.match('刪除[0-9]{4}', msg):
+    #     content = mongodb.delete_my_stock(user_name, msg[2:])
+    #     line_bot_api.push_message(uid, TextSendMessage(content))
+    #     return 0
+    
+    if re.match('清空股票', msg):
+        content = mongodb.delete_my_allstock(user_name)
+        line_bot_api.reply_message(event.reply_token, TextSendMessage(content))
+
+    # if re.match('清空股票', msg):
+    #     content = mongodb.delete_my_allstock(user_name)
+    #     line_bot_api.push_message(uid, TextSendMessage(content))
+    #     return 0
 
     if re.match('關閉提醒', msg):
-        import schedule
         schedule.clear()
 
-    if re.match('股價提醒', event.message.text):
-        import schedule
-        import time
+    if re.match('股價提醒', msg):
         def look_stock_price(stock, condition, price, userID):
             print(userID)
             url = 'https://tw.stock.yahoo.com/q/q?s=' + stock
@@ -347,24 +419,42 @@ def handle_message(event):
             schedule.run_pending()
             time.sleep(1)
 
-    if event.message.text[:2].upper() == '@K':
-        input_word = event.message.text.replace(' ', '')
-        stock_name = input_word[2:6]
-        start_date = input_word[6:]
+    if msg[:3] == '@K/':   # @K/2330/2024-08-01
+        if msg[3:7].replace(' ', '').isdigit():
+            input_word = msg
+            stock_name = input_word[3:7]
+            start_date = input_word[8:]
+        elif msg[3:8].replace(' ', '').isdigit():
+            input_word = msg
+            stock_name = input_word[3:8]
+            start_date = input_word[9:]
         content = plot_stock_k_chart(IMGUR_CLIENT_ID, stock_name, start_date)
-        message = ImageSendMessage(
-            original_content_url=content,
-            preview_image_url=content
-        )
+        message = ImageSendMessage(original_content_url=content, preview_image_url=content)
+
         line_bot_api.reply_message(event.reply_token, message)
 
-    #################################### 外匯區 ##########################################
+    if re.match('先行指標', msg):
+        volume_0000 = volume0000()
+        foreign_investors, investment_trust, DEALER = II3()
+        LOTS = FI_futures()
+        large5, large10 = futures_large()
+        pcr = PCR()
+        FPC = putcall()
 
-    if re.match('幣別種類', msg):
+        content = f'日期：{datetime.datetime.today().strftime("%Y-%m-%d")}\n'
+        content += f'成交量(億元)：{volume_0000}\n外資(億元)：{foreign_investors}\n投信(億元)：{investment_trust}\n自營(億元)：{DEALER}\n'
+        content += f'外資期貨留倉(口)：{LOTS}\n前五大留倉(口)：{large5}\n前十大留倉(口)：{large10}\n'
+        content += f'PCR：{pcr}\n外資選擇權留倉(億元)：{FPC}'
+
+        line_bot_api.reply_message(event.reply_token, TextSendMessage(text=content))
+
+    #################################### 匯率區 ##########################################
+
+    if re.match('幣別代號', msg):
         message = Msg_Template.show_Button()
         line_bot_api.reply_message(event.reply_token, message)
 
-    if re.match('外幣[A-Z]{3}', event.message.text):
+    if re.match('匯率查詢[A-Z]{3}', msg):
         currency_name = EXRate.getCurrencyName(msg)
         if currency_name == "無可支援的外幣":
             content = "無可支援的外幣"
@@ -384,8 +474,7 @@ def handle_message(event):
     #     line_bot_api.push_message(uid, TextSendMessage(content))
     #     return 0
 
-    if re.match('新增外幣[A-Z]{3}', event.message.text):
-        msg = event.message.text
+    if re.match('新增外幣[A-Z]{3}', msg):
         currency = msg[4:7]
         currency_name = EXRate.getCurrencyName(currency)
         if currency_name == "無可支援的外幣": content = "無可支援的外幣"
@@ -408,7 +497,7 @@ def handle_message(event):
     #     line_bot_api.push_message(uid, TextSendMessage(content))
     #     return 0
 
-    if re.match('匯率大小事', event.message.text):
+    if re.match('暢遊美日韓', msg):
         btn_msg = Msg_Template.stock_reply_rate()
         line_bot_api.reply_message(event.reply_token, btn_msg)
 
@@ -417,8 +506,7 @@ def handle_message(event):
     #     line_bot_api.push_message(uid, btn_msg)
     #     return 0
     
-    if re.match('換匯[A-Z]{3}/[A-Z]{3}/[0-9]', event.message.text):
-        msg = event.message.text
+    if re.match('換匯[A-Z]{3}/[A-Z]{3}/[0-9]', msg):
         content = EXRate.getExchangeRate(msg)
         line_bot_api.reply_message(event.reply_token, TextSendMessage(content))
 
@@ -428,7 +516,7 @@ def handle_message(event):
     #     line_bot_api.push_message(uid, TextSendMessage(content))
     #     return 0
     
-    if re.match('外幣清單', event.message.text):
+    if re.match('外幣清單', msg):
         content = mongodb.show_my_currency(uid, user_name)
         line_bot_api.reply_message(event.reply_token, TextSendMessage(content))
 
@@ -439,7 +527,6 @@ def handle_message(event):
     #     return 0
     
     if re.match('刪除外幣[A-Z]{3}', msg):
-        msg = event.message.text
         currency = mongodb.delete_my_currency(user_name, msg[4:7])
         line_bot_api.reply_message(event.reply_token, TextSendMessage(currency))
 
@@ -481,5 +568,4 @@ def handle_message(event):
 
 if __name__ == '__main__':
     app.run()
-
 

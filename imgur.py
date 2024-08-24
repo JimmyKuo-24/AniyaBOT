@@ -1,4 +1,4 @@
-import matplotlib, datetime
+import datetime, matplotlib
 matplotlib.use('Agg')
 from imgurpython import ImgurClient
 
@@ -20,10 +20,10 @@ def showImgur(fileName):
 
     try:
         print('[log:INFO]Uploading file to imgur...')
-        imgur1 = client.upload_from_path(fileName + '.png', config=config, anon=False)['link']
+        imgurl = client.upload_from_path(fileName + '.png', config=config, anon=False)['link']
         print('[log:INFO]Done upload.')
     except:
-        imgur1 = ''
+        imgurl = 'https://i.imgur.com/Fyldio8.jpg'
         print('[log:ERROR]Failed upload.')
 
-    return imgur1
+    return imgurl

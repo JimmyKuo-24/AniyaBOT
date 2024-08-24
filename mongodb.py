@@ -1,5 +1,5 @@
 from pymongo import MongoClient
-import urllib.parse, datetime, EXRate
+import datetime, EXRate, urllib.parse
 from line_bot import *
 
 currency_list = {

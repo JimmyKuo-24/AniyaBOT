@@ -38,12 +38,12 @@ def getCurrencyName(currency):
 def getExchangeRate(msg): # 不同貨幣直接換算(非只限於台幣)
     """
     sample
-    code = '換匯USD/TWD/100;
+    code = '換匯USD/TWD/100'
     code = '換匯USD/JPY/100'
     """
     currency_list = msg[2:].split("/")
-    currency = currency_list[0] # 輸入想查詢的匯率
-    currency1 = currency_list[1] # 輸入想兌換的匯率
+    currency = currency_list[0] # 輸入目前的幣別
+    currency1 = currency_list[1] # 輸入兌換的幣別
     money_value = currency_list[2] # 輸入金額數值
     url_coinbase = 'https://api.coinbase.com/v2/exchange-rates?currency=' + currency
     res = requests.get(url_coinbase)
@@ -74,14 +74,14 @@ def showCurrency(code): # code 為外幣代碼
     return content
 
 def cash_exrate_sixMonth(code1):
-    currency_name = getCurrencyName(code1)# 取得對應的貨幣名稱
+    currency_name = getCurrencyName(code1) # 取得對應的貨幣名稱
     if currency_name == "無可支援的外幣": return "無可支援的外幣"
     dfs = pd.read_html(f'https://rate.bot.com.tw/xrt/quote/l6m/{code1}')
     currency = dfs[0].iloc[:, 0:6]
     # 更改欄位名稱
     currency.columns = [u'Date', u'Currency', u'現金買入', u'現金賣出', u'即期買入',  u'即期賣出']
     currency[u'Currency'] = currency[u'Currency'].str.extract('\((\w+)\)')
-    currency = currency.iloc[::-1] #  row 順序反轉，因原始資料是從最新開始排
+    currency = currency.iloc[::-1] # row 順序反轉，因原始資料是從最新開始排
     if currency["現金買入"][0] == "-" or currency["現金買入"][0]== 0.0:
         return "現金匯率無資料可分析"
     currency.plot(kind = 'line', figsize=(12, 6), x='Date', y=[u'現金買入', u'現金賣出'])
@@ -93,17 +93,17 @@ def cash_exrate_sixMonth(code1):
     return imgur.showImgur(code1)
 
 def spot_exrate_sixMonth(code2):
-    currency_name = getCurrencyName(code2)# 取得對應的貨幣名稱
+    currency_name = getCurrencyName(code2) # 取得對應的貨幣名稱
     if currency_name == "無可支援的外幣": return "無可支援的外幣"
     dfs = pd.read_html(f'https://rate.bot.com.tw/xrt/quote/l6m/{code2}')
     currency = dfs[0].iloc[:, 0:6] # 獲取前6個欄位
     # 更改欄位名稱
     currency.columns = [u'Date', u'Currency', u'現金買入', u'現金賣出', u'即期買入',  u'即期賣出']
     currency[u'Currency'] = currency[u'Currency'].str.extract('\((\w+)\)')
-    currency = currency.iloc[::-1] #  row 順序反轉，因原始資料是從最新開始排
+    currency = currency.iloc[::-1] # row 順序反轉，因原始資料是從最新開始排
     if currency["即期買入"][0] == "-" or currency["即期買入"][0] == 0.0:
         return "即期匯率無資料可分析"
-    currency.plot(kind = 'line', figsize=(12, 6),x='Date', y=[u'即期買入', u'即期賣出'])
+    currency.plot(kind = 'line', figsize=(12, 6), x='Date', y=[u'即期買入', u'即期賣出'])
     plt.legend(prop=chinese_font) # 支援中文字
     plt.title(f"{currency_name} 即期匯率",  fontsize=20, fontproperties=chinese_font)
     plt.savefig(f"{code2}.png")

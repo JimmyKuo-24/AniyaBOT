@@ -133,7 +133,7 @@ def realtime_currency_other(currency):
                                        QuickReplyButton(
                                                 action=MessageAction(
                                                     label="即時匯率", 
-                                                    text="外幣"+currency,
+                                                    text="匯率查詢"+currency,
                                                 )
                                        ),
                                        QuickReplyButton(
@@ -144,16 +144,10 @@ def realtime_currency_other(currency):
                                        ),
                                         QuickReplyButton(
                                                 action=MessageAction(
-                                                    label="走勢圖", 
+                                                    label="趨勢圖", 
                                                     text="CT"+currency,
                                                 )
                                        ),
-                                        QuickReplyButton(
-                                                action=MessageAction(
-                                                    label="新聞", 
-                                                    text="N外匯"+currency,
-                                                )
-                                       )
                                 ]
                             ))
     return text_message
@@ -412,34 +406,34 @@ def show_Button():
     )
     return flex_message
 
-def stock_reply_other():
-    content_text = "分析趨勢圖"
-    text_message = TextSendMessage(
-        text = content_text ,
-        quick_reply=QuickReply(
-            items=[
-                    QuickReplyButton(
-                            action=MessageAction(
-                                label="💜股價查詢💜", 
-                                text="輸入：#xxxx",
-                            )
-                    ),
-                    QuickReplyButton(
-                            action=MessageAction(
-                                label="💜匯率趨勢💜", 
-                                text="輸入：CTUSD",
-                            )
-                    ),
-                    QuickReplyButton(
-                            action=MessageAction(
-                                label="💜股價K線圖💜",  
-                                text="輸入：@K23302024-08-01",
-                            )
-                    )
-            ]
-        )
-    )
-    return text_message
+# def stock_reply_other():
+#     content_text = "分析趨勢"
+#     text_message = TextSendMessage(
+#         text = content_text ,
+#         quick_reply=QuickReply(
+#             items=[
+#                     QuickReplyButton(
+#                             action=MessageAction(
+#                                 label="💜股價查詢💜", 
+#                                 text="輸入：#股票代號",
+#                             )
+#                     ),
+#                     QuickReplyButton(
+#                             action=MessageAction(
+#                                 label="💜匯率趨勢💜", 
+#                                 text="輸入：CT幣別",
+#                             )
+#                     ),
+#                     QuickReplyButton(
+#                             action=MessageAction(
+#                                 label="💜股價K線圖💜",  
+#                                 text="輸入：@K/2330/2024-08-01",
+#                             )
+#                     )
+#             ]
+#         )
+#     )
+#     return text_message
 
 def stock_reply_rate():
     content_text = "想知道匯率？"
@@ -449,20 +443,20 @@ def stock_reply_rate():
             items=[
                     QuickReplyButton(
                             action=MessageAction(
-                                label="💜💜查詢單一幣別匯率", 
-                                text="幣別種類",
+                                label="💜💜查詢美元匯率", 
+                                text="匯率查詢USD",
                             )
                     ),
                     QuickReplyButton(
                             action=MessageAction(
-                                label="💜💜查詢幣別匯率", 
-                                text="匯率兌換",
+                                label="💜💜查詢日元匯率", 
+                                text="匯率查詢JPY",
                             )
                     ),
                     QuickReplyButton(
                             action=MessageAction(
-                                label="💜💜關注的匯率", 
-                                text="外幣清單",
+                                label="💜💜查詢韓元匯率", 
+                                text="匯率查詢KRW",
                             )
                     )
             ]
@@ -474,125 +468,251 @@ def usage_msg():
     flex_message = FlexSendMessage(
             alt_text="使用說明",
             contents={
-        "type": "bubble",
-        "hero": {
-            "type": "image",
-            "url": "https://i.imgur.com/DzvWgBs.jpg",
-            "size": "full",
-            "aspectRatio": "20:13",
-            "aspectMode": "cover",
-            "action": {
-            "type": "uri",
-            "uri": "https://line.me/"
-            }
-        },
-        "body": {
-            "type": "box",
-            "layout": "vertical",
-            "contents": [
+        "type": "carousel",
+        "contents": [
             {
-                "type": "text",
-                "text": "✯ ✯ ✯ 查詢方法 ✯ ✯ ✯",
-                "weight": "bold",
-                "size": "lg",
-                "align": "center"
+            "type": "bubble",
+            "size": "micro",
+            "hero": {
+                "type": "image",
+                "url": "https://i.imgur.com/k2FqRn3.jpg",
+                "size": "full",
+                "aspectMode": "cover",
+                "aspectRatio": "320:213"
             },
-            {
-                "type": "box",
-                "layout": "vertical",
-                "margin": "lg",
-                "spacing": "sm",
-                "contents": [
-                {
-                    "type": "box",
-                    "layout": "baseline",
-                    "spacing": "sm",
-                    "contents": [
-                    {
-                        "type": "text",
-                        "text": "請輸入，Aniya可查油價及匯率！",
-                        "size": "md",
-                        "flex": 5,
-                        "align": "center",
-                        "weight": "bold"
-                    }
-                    ]
-                }
-                ]
-            },
-            {
-                "type": "box",
-                "layout": "vertical",
-                "margin": "lg",
-                "spacing": "sm",
-                "contents": [
-                {
-                    "type": "box",
-                    "layout": "baseline",
-                    "spacing": "sm",
-                    "contents": [
-                    {
-                        "type": "text",
-                        "text": "☸ 今日油價➦輸入➦查詢油價",
-                        "size": "sm",
-                        "flex": 5,
-                        "weight": "bold"
-                    }
-                    ]
-                }
-                ]
-            },
-            {
-                "type": "box",
-                "layout": "vertical",
-                "margin": "lg",
-                "spacing": "sm",
-                "contents": [
-                {
-                    "type": "box",
-                    "layout": "baseline",
-                    "spacing": "sm",
-                    "contents": [
-                    {
-                        "type": "text",
-                        "text": "☸ 今日匯率➦輸入➦查詢匯率",
-                        "size": "sm",
-                        "flex": 5,
-                        "weight": "bold"
-                    }
-                    ]
-                }
-                ]
-            },
-            {
-                "type": "box",
-                "layout": "vertical",
-                "margin": "lg",
-                "spacing": "sm",
-                "contents": [
-                {
-                    "type": "box",
-                    "layout": "baseline",
-                    "spacing": "sm",
-                    "contents": [
-                    {
-                        "type": "text",
-                        "text": "☸ 匯率兌換➦輸入➦換匯USD/TWD/100",
-                        "size": "sm",
-                        "flex": 5,
-                        "weight": "bold"
-                    }
-                    ]
-                }
-                ]
-            }
-            ]
-        },
-        "styles": {
             "body": {
-            "backgroundColor": "#F8EDED"
+                "type": "box",
+                "layout": "vertical",
+                "contents": [
+                {
+                    "type": "text",
+                    "text": "股票指令",
+                    "weight": "bold",
+                    "size": "lg",
+                    "align": "center"
+                },
+                {
+                    "type": "button",
+                    "action": {
+                    "type": "message",
+                    "label": "股價查詢",
+                    "text": "#股票代號 (#2330、#00878)"
+                    },
+                    "color": "#EECAD5",
+                    "style": "secondary"
+                },
+                {
+                    "type": "button",
+                    "action": {
+                    "type": "message",
+                    "label": "關注股票",
+                    "text": "關注XXXX>$$$$ (關注+2330+<=>+1000)"
+                    },
+                    "color": "#EECAD5",
+                    "style": "secondary"
+                },
+                {
+                    "type": "button",
+                    "action": {
+                    "type": "message",
+                    "label": "股票清單",
+                    "text": "股票清單"
+                    },
+                    "color": "#EECAD5",
+                    "style": "secondary"
+                },
+                {
+                    "type": "button",
+                    "action": {
+                    "type": "message",
+                    "label": "刪除股票",
+                    "text": "刪除股票代號 (2330、00878)"
+                    },
+                    "color": "#EECAD5",
+                    "style": "secondary"
+                },
+                {
+                    "type": "button",
+                    "action": {
+                    "type": "message",
+                    "label": "清空股票",
+                    "text": "清空股票"
+                    },
+                    "color": "#EECAD5",
+                    "style": "secondary"
+                },
+                {
+                    "type": "button",
+                    "action": {
+                    "type": "message",
+                    "label": "股價提醒",
+                    "text": "股價提醒"
+                    },
+                    "color": "#EECAD5",
+                    "style": "secondary"
+                },
+                {
+                    "type": "button",
+                    "action": {
+                    "type": "message",
+                    "label": "關閉提醒",
+                    "text": "關閉提醒"
+                    },
+                    "color": "#EECAD5",
+                    "style": "secondary"
+                },
+                {
+                    "type": "button",
+                    "action": {
+                    "type": "message",
+                    "label": "股票K線圖",
+                    "text": "@K/股票代號/年-月-日 (2330、2024-08-01)"
+                    },
+                    "color": "#EECAD5",
+                    "style": "secondary"
+                },
+                {
+                    "type": "button",
+                    "action": {
+                    "type": "message",
+                    "label": "財經學堂",
+                    "text": "財經學堂"
+                    },
+                    "color": "#EECAD5",
+                    "style": "secondary"
+                }
+                ],
+                "spacing": "md",
+                "paddingAll": "13px"
+            },
+            "styles": {
+                "body": {
+                "backgroundColor": "#F6EACB"
+                }
             }
-        }
+            },
+            {
+            "type": "bubble",
+            "size": "micro",
+            "hero": {
+                "type": "image",
+                "url": "https://i.imgur.com/LhsGNgU.jpg",
+                "size": "full",
+                "aspectMode": "cover",
+                "aspectRatio": "320:213"
+            },
+            "body": {
+                "type": "box",
+                "layout": "vertical",
+                "contents": [
+                {
+                    "type": "text",
+                    "text": "匯率指令",
+                    "weight": "bold",
+                    "size": "lg",
+                    "align": "center"
+                },
+                {
+                    "type": "button",
+                    "action": {
+                    "type": "message",
+                    "label": "幣別代號",
+                    "text": "幣別代號"
+                    },
+                    "color": "#FFDA76",
+                    "style": "secondary"
+                },
+                {
+                    "type": "button",
+                    "action": {
+                    "type": "message",
+                    "label": "匯率查詢",
+                    "text": "匯率查詢幣別代號 (匯率查詢+USD)"
+                    },
+                    "color": "#FFDA76",
+                    "style": "secondary"
+                },
+                {
+                    "type": "button",
+                    "action": {
+                    "type": "message",
+                    "label": "新增外幣",
+                    "text": "新增外幣幣別代號 (新增外幣+USD)"
+                    },
+                    "color": "#FFDA76",
+                    "style": "secondary"
+                },
+                {
+                    "type": "button",
+                    "action": {
+                    "type": "message",
+                    "label": "暢遊美日韓",
+                    "text": "暢遊美日韓"
+                    },
+                    "color": "#FFDA76",
+                    "style": "secondary"
+                },
+                {
+                    "type": "button",
+                    "action": {
+                    "type": "message",
+                    "label": "換匯試算",
+                    "text": "換匯幣別(1)/幣別(2)/金額 (TWD/USD/10000)"
+                    },
+                    "color": "#FFDA76",
+                    "style": "secondary"
+                },
+                {
+                    "type": "button",
+                    "action": {
+                    "type": "message",
+                    "label": "外幣清單",
+                    "text": "外幣清單"
+                    },
+                    "color": "#FFDA76",
+                    "style": "secondary"
+                },
+                {
+                    "type": "button",
+                    "action": {
+                    "type": "message",
+                    "label": "刪除外幣",
+                    "text": "刪除外幣幣別 (刪除外幣+USD)"
+                    },
+                    "color": "#FFDA76",
+                    "style": "secondary"
+                },
+                {
+                    "type": "button",
+                    "action": {
+                    "type": "message",
+                    "label": "清空外幣",
+                    "text": "清空外幣"
+                    },
+                    "color": "#FFDA76",
+                    "style": "secondary"
+                },
+                {
+                    "type": "button",
+                    "action": {
+                    "type": "message",
+                    "label": "匯率曲線圖",
+                    "text": "CT幣別 (CT+USD)"
+                    },
+                    "color": "#FFDA76",
+                    "style": "secondary"
+                }
+                ],
+                "spacing": "md",
+                "paddingAll": "13px"
+            },
+            "styles": {
+                "body": {
+                "backgroundColor": "#B4D6CD"
+                }
+            }
+            }
+        ]
         }
     )
     return flex_message
