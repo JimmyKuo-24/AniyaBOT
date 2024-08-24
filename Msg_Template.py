@@ -627,7 +627,7 @@ def usage_msg():
                     "action": {
                     "type": "message",
                     "label": "匯率查詢",
-                    "text": "匯率查詢幣別代號 (匯率查詢+USD)"
+                    "text": "匯率查詢幣別 (匯率查詢+USD)"
                     },
                     "color": "#FFDA76",
                     "style": "secondary"
@@ -637,7 +637,7 @@ def usage_msg():
                     "action": {
                     "type": "message",
                     "label": "新增外幣",
-                    "text": "新增外幣幣別代號 (新增外幣+USD)"
+                    "text": "新增外幣幣別 (新增外幣+USD)"
                     },
                     "color": "#FFDA76",
                     "style": "secondary"
@@ -728,7 +728,7 @@ def yt_channel():
             "size": "micro",
             "hero": {
                 "type": "image",
-                "url": "https://imgur.com/SJPH542.jpg",
+                "url": "https://i.imgur.com/epbqzAY.jpg",
                 "aspectMode": "fit",
                 "aspectRatio": "320:213",
                 "size": "full",
@@ -806,7 +806,7 @@ def yt_channel():
             "size": "micro",
             "hero": {
                 "type": "image",
-                "url": "https://imgur.com/dPW0jcC.jpg",
+                "url": "https://i.imgur.com/k6CTret.jpg",
                 "size": "full",
                 "aspectMode": "fit",
                 "aspectRatio": "320:213",
@@ -884,7 +884,7 @@ def yt_channel():
             "size": "micro",
             "hero": {
                 "type": "image",
-                "url": "https://imgur.com/zkUZrCj.jpg",
+                "url": "https://i.imgur.com/1g7ONhA.jpg",
                 "size": "full",
                 "aspectMode": "fit",
                 "aspectRatio": "320:213",
