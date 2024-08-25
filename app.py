@@ -148,7 +148,7 @@ def putcall():
     table = pd.read_html('https://www.taifex.com.tw/cht/3/callsAndPutsDateExcel', encoding='utf8')
     fcall = str(table[2].iloc[2,15]).replace(',','')
     fput = str(table[2].iloc[5,15]).replace(',','')
-    FPC = (int(fcall) - int(fput))/10**5
+    FPC = round((int(fcall) - int(fput))/10**5, 3)
 
     return FPC
 
@@ -443,7 +443,7 @@ def handle_message(event):
 
         content = f'日期：{date}\n成交量(億元)：{volume_0000}\n外資(億元)：{foreign_investors}\n投信(億元)：{investment_trust}\n自營(億元)：{DEALER}\n'
         content += f'外資期貨(口)：{LOTS}\n前五大(口)：{large5}\n前十大(口)：{large10}\n大台期貨(口): {TX}\n'
-        content += f'PCR：{pcr}\n外資選擇權(億元)：{FPC}\n韭菜指數: {cut}'
+        content += f'PCR：{pcr}%\n外資選擇權(億元)：\n{FPC}\n韭菜指數: {cut}%'
 
         line_bot_api.reply_message(event.reply_token, TextSendMessage(text=content))
 
