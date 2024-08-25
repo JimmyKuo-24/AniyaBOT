@@ -1,10 +1,10 @@
 from flask import Flask, request, abort
-from linebot import (LineBotApi, WebhookHandler, exceptions)
-from linebot.exceptions import (InvalidSignatureError)
+from linebot import exceptions, LineBotApi, WebhookHandler
+from linebot.exceptions import InvalidSignatureError
 from linebot.models import *
 from line_bot import *
 from bs4 import BeautifulSoup
-import datetime, EXRate, re, requests, schedule, time, twstock, mongodb, mplfinance as mpf, Msg_Template, pyimgur, yfinance as yf
+import datetime, EXRate, pandas as pd, re, requests, schedule, time, twstock, mongodb, mplfinance as mpf, Msg_Template, pyimgur, yfinance as yf
 from openai import OpenAI
 
 app = Flask(__name__)
@@ -93,74 +93,71 @@ def Usage(event):
 
     
 def volume0000():
-    rs0 = requests.session()
-    res = rs0.get('https://www.twse.com.tw/rwd/zh/afterTrading/MI_INDEX?response=html', verify=False)
-    res.encoding = 'utf8'
-    soup = BeautifulSoup(res.text, 'html.parser')
-    date = soup.find_all('th')[0].text[:11].replace('\n','')
-    volume_0000 = round(int(soup.find_all('td')[-18].text.replace(',',''))/10**8)
+    table = pd.read_html('https://www.twse.com.tw/rwd/zh/afterTrading/MI_INDEX?response=html', encoding='utf8')
+    volume_0000 = round(table[0].iloc[16, 1]/10**8)
     
-    return date, volume_0000
+    return volume_0000
 
 def II3():   # institutional investors 三大法人
-    rs = requests.session()
-    res = rs.get('https://www.twse.com.tw/rwd/zh/fund/BFI82U?response=html', verify=False)
-    res.encoding = 'utf8'
-    soup = BeautifulSoup(res.text, 'html.parser')
-    
-    foreign_investors = round(int(soup.find_all('td')[15].text.replace(',',''))/10**8)
-    investment_trust = round(int(soup.find_all('td')[11].text.replace(',',''))/10**8)
-    dealer = int(soup.find_all('td')[3].text.replace(',',''))/10**8
-    dealer_hedge = int(soup.find_all('td')[7].text.replace(',',''))/10**8
-    DEALER = round(dealer + dealer_hedge)
+    table = pd.read_html('https://www.twse.com.tw/rwd/zh/fund/BFI82U?response=html', encoding='utf8')
+    foreign_investors = round(int(str(table[0].iloc[3, 3]).replace(',',''))/10**8, 1)
+    investment_trust = round(int(str(table[0].iloc[2, 3]).replace(',',''))/10**8, 1)
+    dealer = int(str(table[0].iloc[0, 3]).replace(',',''))/10**8
+    dealer_hedge = int(str(table[0].iloc[1, 3]).replace(',',''))/10**8
+    DEALER = round(dealer + dealer_hedge, 1)
 
     return foreign_investors, investment_trust, DEALER
 
 def FI_futures():
-    rs = requests.session()
-    res = rs.get('https://www.taifex.com.tw/cht/3/futContractsDate', verify=False)
-    res.encoding = 'utf8'
-    soup = BeautifulSoup(res.text, 'html.parser')
-    big = soup.find_all('td')[39].text.replace(',','')
-    small = soup.find_all('td')[162].text.replace(',','')
-    micro = soup.find_all('td')[203].text.replace(',','')
+    table = pd.read_html('https://www.taifex.com.tw/cht/3/futContractsDateExcel', encoding='utf8')
+    big = str(table[1].iloc[2, 13]).replace(',','')
+    small = str(table[1].iloc[11, 13]).replace(',','')
+    micro = str(table[1].iloc[14, 13]).replace(',','')
     LOTS = round(int(big) + int(small)/4 + int(micro)/20)
     
-    return LOTS
+    leeks = -(int(str(table[1].iloc[9, 13]).replace(',','')) + int(str(table[1].iloc[10, 13]).replace(',','')) + int(small))
+    
+    return LOTS, leeks
 
 def futures_large():
-    rs = requests.session()
-    res = rs.get('https://www.taifex.com.tw/cht/3/largeTraderFutQry', verify=False)
-    res.encoding = 'utf8'
-    soup = BeautifulSoup(res.text, 'html.parser')
-    B5 = soup.find_all('td')[22].text.replace(',','').split()
-    S5 = soup.find_all('td')[26].text.replace(',','').split()
+    table = pd.read_html('https://www.taifex.com.tw/cht/3/largeTraderFutQryTbl', encoding='utf8')
+    B5 = str(table[1].iloc[2, 2]).replace(',','').split()
+    S5 = str(table[1].iloc[2, 6]).replace(',','').split()
     large5 = int(B5[0]) - int(S5[0])
-    B10 = soup.find_all('td')[24].text.replace(',','').split()
-    S10 = soup.find_all('td')[28].text.replace(',','').split()
+    B10 = str(table[1].iloc[2, 4]).replace(',','').split()
+    S10 = str(table[1].iloc[2, 8]).replace(',','').split()
     large10 = int(B10[0]) - int(S10[0])
 
-    return large5, large10
+    date = table[0].iloc[0, 0]
+
+    return date, large5, large10
+
+def futures():
+    table = pd.read_html('https://www.taifex.com.tw/cht/3/futDailyMarketExcel', encoding='utf8')
+    TX = int(table[0].iloc[-1, 12])
+
+    return TX
 
 def PCR():
-    rs = requests.session()
-    res = rs.get('https://www.taifex.com.tw/cht/3/pcRatio', verify=False)
-    res.encoding = 'utf8'
-    soup = BeautifulSoup(res.text, 'html.parser')
-    pcr = eval(soup.find_all('td')[6].text)
+    table = pd.read_html('https://www.taifex.com.tw/cht/3/pcRatioExcel', encoding='utf8')
+    pcr = float(table[2].iloc[0, 6])
     
     return pcr
 
 def putcall():
-    rs = requests.session()
-    res = rs.get('https://www.taifex.com.tw/cht/3/callsAndPutsDate', verify=False)
-    res.encoding = 'utf8'
-    soup = BeautifulSoup(res.text, 'html.parser')
-    fcall = soup.find_all('td')[41].text.replace(',','').split()
-    fput = soup.find_all('td')[81].text.replace(',','').split()
-    FPC = (int(fcall[0]) - int(fput[0]))/10**5
+    table = pd.read_html('https://www.taifex.com.tw/cht/3/callsAndPutsDateExcel', encoding='utf8')
+    fcall = str(table[2].iloc[2,15]).replace(',','')
+    fput = str(table[2].iloc[5,15]).replace(',','')
+    FPC = (int(fcall) - int(fput))/10**5
 
     return FPC
+
+def cut_leeks(leeks):
+    table = pd.read_html('https://www.taifex.com.tw/cht/3/futDailyMarketExcel?commodity_id=MTX', encoding='utf8')
+    MTX = int(table[0].iloc[-1, 12])
+    cut = round(11426/MTX, 3)*100
+
+    return cut
 
 
 @handler.add(MessageEvent, message=TextMessage)
@@ -435,17 +432,18 @@ def handle_message(event):
         line_bot_api.reply_message(event.reply_token, message)
 
     if re.match('先行指標', msg):
-        date, volume_0000 = volume0000()
+        volume_0000 = volume0000()
         foreign_investors, investment_trust, DEALER = II3()
-        LOTS = FI_futures()
-        large5, large10 = futures_large()
+        LOTS, leeks = FI_futures()
+        date, large5, large10 = futures_large()
+        TX = futures()
         pcr = PCR()
         FPC = putcall()
+        cut = cut_leeks(leeks)
 
-        content = f'日期：{date}\n'
-        content += f'成交量(億元)：{volume_0000}\n外資(億元)：{foreign_investors}\n投信(億元)：{investment_trust}\n自營(億元)：{DEALER}\n'
-        content += f'外資期貨留倉(口)：{LOTS}\n前五大留倉(口)：{large5}\n前十大留倉(口)：{large10}\n'
-        content += f'PCR：{pcr}\n外資選擇權留倉(億元)：{FPC}'
+        content = f'日期：{date}\n成交量(億元)：{volume_0000}\n外資(億元)：{foreign_investors}\n投信(億元)：{investment_trust}\n自營(億元)：{DEALER}\n'
+        content += f'外資期貨(口)：{LOTS}\n前五大(口)：{large5}\n前十大(口)：{large10}\n大台期貨(口): {TX}\n'
+        content += f'PCR：{pcr}\n外資選擇權(億元)：{FPC}\n韭菜指數: {cut}'
 
         line_bot_api.reply_message(event.reply_token, TextSendMessage(text=content))
 
