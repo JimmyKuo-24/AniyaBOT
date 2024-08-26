@@ -174,7 +174,7 @@ def putcall():
 def cut_leeks(leeks):
     table = pd.read_html('https://www.taifex.com.tw/cht/3/futDailyMarketExcel?commodity_id=MTX', encoding='utf8')
     MTX = int(table[0].iloc[-1, 12])
-    cut = round(11426/MTX, 3)*100
+    cut = round(leeks/MTX, 3)*100
 
     return cut
 
