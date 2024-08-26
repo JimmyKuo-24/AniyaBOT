@@ -26,10 +26,11 @@ def callback():
         reply_token = json_data['events'][0]['replyToken']
         user_id = json_data['events'][0]['source']['userId']
         print(json_data)
-        if json_data['events'][0]['message']['type'] == 'text':
-            text = json_data['events'][0]['message']['text']
-            if text == '雷達回波圖' or text == '雷達回波':
-                reply_image(f'https://cwbopendata.s3.ap-northeast-1.amazonaws.com/MSC/O-A0058-003.png?{time.time_ns()}', reply_token, access_token)
+        if 'message' in json_data['events'][0]:
+            if json_data['events'][0]['message']['type'] == 'text':
+                text = json_data['events'][0]['message']['text']
+                if text == '雷達回波圖' or text == '雷達回波':
+                    reply_image(f'https://cwbopendata.s3.ap-northeast-1.amazonaws.com/MSC/O-A0058-003.png?{datetime.datetime.today()}', reply_token, access_token)
     except: 
         print("error")
     return 'OK'
