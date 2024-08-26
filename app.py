@@ -295,7 +295,7 @@ def handle_message(event):
 
     #################################### 氣象區 ##########################################
 
-    if text == '雷達回波圖' or text == '雷達回波':
+    if re.match('雷達回波', msg):
         reply_token = event.reply_token
         reply_image(f'https://cwbopendata.s3.ap-northeast-1.amazonaws.com/MSC/O-A0058-001.png?{time.time_ns()}', reply_token, access_token)
 
@@ -479,14 +479,18 @@ def handle_message(event):
         line_bot_api.reply_message(event.reply_token, message)
 
     if re.match('先行指標', msg):
-        volume_0000 = volume0000()
-        foreign_investors, investment_trust, DEALER = II3()
-        LOTS, leeks = FI_futures()
-        date, large5, large10 = futures_large()
-        TX = futures()
-        pcr = PCR()
-        FPC = putcall()
-        cut = cut_leeks(leeks)
+        try:
+            volume_0000 = volume0000()
+            foreign_investors, investment_trust, DEALER = II3()
+            LOTS, leeks = FI_futures()
+            date, large5, large10 = futures_large()
+            TX = futures()
+            pcr = PCR()
+            FPC = putcall()
+            cut = cut_leeks(leeks)
+        except:
+            line_bot_api.reply_message(event.reply_token, TextSendMessage(text='先行指標資料取得失敗'))
+            return 0
 
         content = f'日期：{date}\n成交量(億元)：{volume_0000}\n外資(億元)：{foreign_investors}\n投信(億元)：{investment_trust}\n自營(億元)：{DEALER}\n'
         content += f'外資期貨(口)：{LOTS}\n前五大(口)：{large5}\n前十大(口)：{large10}\n大台期貨(口): {TX}\n'
