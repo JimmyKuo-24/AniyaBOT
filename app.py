@@ -296,12 +296,12 @@ def handle_message(event):
     #################################### 氣象區 ##########################################
 
     if re.match('雷達回波', msg):
-        url = f'https://cwbopendata.s3.ap-northeast-1.amazonaws.com/MSC/O-A0058-001.png?{time.time_ns()}'
-        img_msg = ImageSendMessage(
+        url = 'https://www.cwa.gov.tw/Data/radar/CV1_3600.png'
+        radar_img = ImageSendMessage(
             original_content_url=url,
             preview_image_url=url
         )
-        line_bot_api.reply_message(event.reply_token, img_msg)
+        line_bot_api.reply_message(event.reply_token, radar_img)
         # reply_token = event.reply_token
         # reply_image(f'https://cwbopendata.s3.ap-northeast-1.amazonaws.com/MSC/O-A0058-001.png?{time.time_ns()}', reply_token, access_token)
 
