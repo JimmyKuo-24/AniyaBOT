@@ -506,7 +506,7 @@ def usage_msg():
                     "action": {
                     "type": "message",
                     "label": "關注股票",
-                    "text": "關注XXXX>$$$$ (關注+2330+<=>+1000)"
+                    "text": "關注XXXX>$$$$ (關注2330<=>1000)"
                     },
                     "color": "#EECAD5",
                     "style": "secondary"
@@ -526,7 +526,7 @@ def usage_msg():
                     "action": {
                     "type": "message",
                     "label": "刪除股票",
-                    "text": "刪除股票代號 (2330、00878)"
+                    "text": "刪除股票代號 (刪除2330、00878)"
                     },
                     "color": "#EECAD5",
                     "style": "secondary"
@@ -566,7 +566,7 @@ def usage_msg():
                     "action": {
                     "type": "message",
                     "label": "股票K線圖",
-                    "text": "@K/股票代號/年-月-日 (2330、2024-08-01)"
+                    "text": "@K/股票代號/年-月-日 (@K/2330/2024-08-23)"
                     },
                     "color": "#EECAD5",
                     "style": "secondary"
@@ -627,7 +627,7 @@ def usage_msg():
                     "action": {
                     "type": "message",
                     "label": "匯率查詢",
-                    "text": "匯率查詢幣別 (匯率查詢+USD)"
+                    "text": "匯率查詢幣別 (匯率查詢USD)"
                     },
                     "color": "#FFDA76",
                     "style": "secondary"
@@ -637,7 +637,7 @@ def usage_msg():
                     "action": {
                     "type": "message",
                     "label": "新增外幣",
-                    "text": "新增外幣幣別 (新增外幣+USD)"
+                    "text": "新增外幣幣別 (新增外幣USD)"
                     },
                     "color": "#FFDA76",
                     "style": "secondary"
@@ -677,7 +677,7 @@ def usage_msg():
                     "action": {
                     "type": "message",
                     "label": "刪除外幣",
-                    "text": "刪除外幣幣別 (刪除外幣+USD)"
+                    "text": "刪除外幣幣別 (刪除外幣USD)"
                     },
                     "color": "#FFDA76",
                     "style": "secondary"
@@ -697,7 +697,7 @@ def usage_msg():
                     "action": {
                     "type": "message",
                     "label": "匯率曲線圖",
-                    "text": "CT幣別 (CT+USD)"
+                    "text": "CT幣別 (CTUSD)"
                     },
                     "color": "#FFDA76",
                     "style": "secondary"
