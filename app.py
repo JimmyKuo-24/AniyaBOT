@@ -112,7 +112,7 @@ def push_msg(event, msg):
         line_bot_api.push_message(room_id, TextSendMessage(text=msg))
 
 def reply_image(msg, rk, token):
-    headers = {'Authorization': f'Bearer + {token}', 'Content-Type': 'application/json'}
+    headers = {'Authorization': f'Bearer {token}', 'Content-Type': 'application/json'}
     body = {'replyToken': rk, 'messages': [{'type': 'image', 'originalContentUrl': msg, 'previewImageUrl': msg}]}
     req = requests.request('POST', 'https://api.line.me/v2/bot/message/reply', headers=headers, data=json.dumps(body).encode('utf-8'))
     print(req.text)

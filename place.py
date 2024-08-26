@@ -823,3 +823,4 @@ def quick_reply_weather(mat):
                                             QuickReplyButton(action=LocationAction(label='回傳地址查詢'))
                                         ]
                                    ))
+    return text_message
