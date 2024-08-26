@@ -820,6 +820,6 @@ def quick_reply_weather(mat):
                                    quick_reply=QuickReply(
                                         items=[
                                             QuickReplyButton(action=MessageAction(label='查詢其他天氣', text='其他'+mat)),
-                                            QuickReplyButton(action=MessageAction(label='回傳地址查詢'))
+                                            QuickReplyButton(action=LocationAction(label='回傳地址查詢'))
                                         ]
                                    ))
