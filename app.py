@@ -4,14 +4,29 @@ from linebot.exceptions import InvalidSignatureError
 from linebot.models import *
 from line_bot import *
 from bs4 import BeautifulSoup
-import datetime, EXRate, json, pandas as pd, re, requests, schedule, time, twstock, mongodb, mplfinance as mpf, Msg_Template, pyimgur, yfinance as yf
+import datetime, EXRate , json, pandas as pd, place, re, requests, schedule, time, twstock, mongodb, mplfinance as mpf, Msg_Template, pyimgur, yfinance as yf
 from openai import OpenAI
 
 app = Flask(__name__)
 IMGUR_CLIENT_ID = '377a9d38e49c276'
 access_token = 'fBBQE7ZnUiwPfQ4TxnXeD8AcpfSMtcckArANHkxxZoGij3Ofp2tqQSZi0+zgeOHaxax3Zjd0zKtRoU9dp+5MhU5h/okOMpsMylgJoStsrhLEOHqhAw2lLID+KRHGg2mQFiYngozPa2NGQj5BG3qWawdB04t89/1O/w1cDnyilFU='
+mat_d = {}
 
 # push_message free 200則/月
+
+# @app.route('/callback', methods=['POST'])
+# def callback():
+#     signature = request.headers['X-Line-Signature']
+
+#     body = request.get_data(as_text=True)
+#     app.logger.info('Request body: ' + body)
+
+#     try:
+#         handler.handle(body, signature)
+#     except InvalidSignatureError:
+#         app.logger.info('Invalid signature. Please check your channel access token/chanel secret.')
+#         abort(400)
+#     return 'OK'
 
 @app.route('/callback', methods=['POST'])
 def callback():
@@ -34,11 +49,6 @@ def callback():
     except: 
         print("error")
     return 'OK'
-
-    # except InvalidSignatureError:
-    #     app.logger.info('Invalid signature. Please check your channel access token/chanel secret.')
-    #     abort(400)
-    # return 'OK'
 
 @handler.add(FollowEvent)
 def handle_follow(event):
@@ -175,7 +185,7 @@ def putcall():
 def cut_leeks(leeks):
     table = pd.read_html('https://www.taifex.com.tw/cht/3/futDailyMarketExcel?commodity_id=MTX', encoding='utf8')
     MTX = int(table[0].iloc[-1, 12])
-    cut = round(leeks/MTX, 3)*100
+    cut = round(11426/MTX, 3)*100
 
     return cut
 
@@ -282,6 +292,19 @@ def handle_message(event):
     if msg == '財經學堂':
         content = Msg_Template.yt_channel()
         line_bot_api.reply_message(event.reply_token, content)
+
+    #################################### 目錄區 ##########################################
+
+    if re.match('最新氣象|查詢天氣|weather|Weather|', msg):
+        content = place.img_Carousel()
+        line_bot_api.reply_message(event.reply_token, content)
+        return 0
+
+    if re.match('即時天氣|即時氣象', msg):
+        mat_d[uid] = '即時天氣'
+        content = place.quick_reply_weather(mat_d[uid])
+        line_bot_api.reply_message(event.reply_token, content)
+        return 0
 
     #################################### 股票區 ##########################################
 
