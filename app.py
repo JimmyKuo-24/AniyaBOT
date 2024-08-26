@@ -7,26 +7,12 @@ from bs4 import BeautifulSoup
 import datetime, EXRate , json, pandas as pd, place, re, requests, schedule, time, twstock, mongodb, mplfinance as mpf, Msg_Template, pyimgur, yfinance as yf
 from openai import OpenAI
 
+# push_message free 200則/月
+
 app = Flask(__name__)
 IMGUR_CLIENT_ID = '377a9d38e49c276'
 access_token = 'fBBQE7ZnUiwPfQ4TxnXeD8AcpfSMtcckArANHkxxZoGij3Ofp2tqQSZi0+zgeOHaxax3Zjd0zKtRoU9dp+5MhU5h/okOMpsMylgJoStsrhLEOHqhAw2lLID+KRHGg2mQFiYngozPa2NGQj5BG3qWawdB04t89/1O/w1cDnyilFU='
 mat_d = {}
-
-# push_message free 200則/月
-
-# @app.route('/callback', methods=['POST'])
-# def callback():
-#     signature = request.headers['X-Line-Signature']
-
-#     body = request.get_data(as_text=True)
-#     app.logger.info('Request body: ' + body)
-
-#     try:
-#         handler.handle(body, signature)
-#     except InvalidSignatureError:
-#         app.logger.info('Invalid signature. Please check your channel access token/chanel secret.')
-#         abort(400)
-#     return 'OK'
 
 @app.route('/callback', methods=['POST'])
 def callback():
@@ -37,18 +23,38 @@ def callback():
 
     try:
         handler.handle(body, signature)
-        json_data = json.loads(body)
-        reply_token = json_data['events'][0]['replyToken']
-        user_id = json_data['events'][0]['source']['userId']
-        print(json_data)
-        if 'message' in json_data['events'][0]:
-            if json_data['events'][0]['message']['type'] == 'text':
-                text = json_data['events'][0]['message']['text']
-                if text == '雷達回波圖' or text == '雷達回波':
-                    reply_image(f'https://cwbopendata.s3.ap-northeast-1.amazonaws.com/MSC/O-A0058-003.png?{time.time_ns()}', reply_token, access_token)
-    except: 
-        print("error")
+    except InvalidSignatureError:
+        app.logger.info('Invalid signature. Please check your channel access token/chanel secret.')
+        abort(400)
     return 'OK'
+
+# @app.route('/callback', methods=['POST'])
+# def callback():
+#     signature = request.headers['X-Line-Signature']
+
+#     body = request.get_data(as_text=True)
+#     app.logger.info('Request body: ' + body)
+
+#     try:
+#         handler.handle(body, signature)
+#         json_data = json.loads(body)
+#         reply_token = json_data['events'][0]['replyToken']
+#         user_id = json_data['events'][0]['source']['userId']
+#         print(json_data)
+#         if 'message' in json_data['events'][0]:
+#             if json_data['events'][0]['message']['type'] == 'text':
+#                 text = json_data['events'][0]['message']['text']
+#                 if text == '雷達回波圖' or text == '雷達回波':
+#                     reply_image(f'https://cwbopendata.s3.ap-northeast-1.amazonaws.com/MSC/O-A0058-001.png?{time.time_ns()}', reply_token, access_token)
+#     except: 
+#         print("error")
+#     return 'OK'
+
+def reply_image(msg, rk, token):
+    headers = {'Authorization': f'Bearer {token}', 'Content-Type': 'application/json'}
+    body = {'replyToken': rk, 'messages': [{'type': 'image', 'originalContentUrl': msg, 'previewImageUrl': msg}]}
+    req = requests.request('POST', 'https://api.line.me/v2/bot/message/reply', headers=headers, data=json.dumps(body).encode('utf-8'))
+    print(req.text)
 
 @handler.add(FollowEvent)
 def handle_follow(event):
@@ -111,16 +117,10 @@ def push_msg(event, msg):
         room_id = event.source.user_id
         line_bot_api.push_message(room_id, TextSendMessage(text=msg))
 
-def reply_image(msg, rk, token):
-    headers = {'Authorization': f'Bearer {token}', 'Content-Type': 'application/json'}
-    body = {'replyToken': rk, 'messages': [{'type': 'image', 'originalContentUrl': msg, 'previewImageUrl': msg}]}
-    req = requests.request('POST', 'https://api.line.me/v2/bot/message/reply', headers=headers, data=json.dumps(body).encode('utf-8'))
-    print(req.text)
 
 def Usage(event):
     guide_msg = Msg_Template.usage_msg()
     line_bot_api.reply_message(event.reply_token, guide_msg)
-
     
 def volume0000():
     table = pd.read_html('https://www.twse.com.tw/rwd/zh/afterTrading/MI_INDEX?response=html', encoding='utf8')
@@ -294,6 +294,10 @@ def handle_message(event):
         line_bot_api.reply_message(event.reply_token, content)
 
     #################################### 氣象區 ##########################################
+
+    if text == '雷達回波圖' or text == '雷達回波':
+        reply_token = event.reply_token
+        reply_image(f'https://cwbopendata.s3.ap-northeast-1.amazonaws.com/MSC/O-A0058-001.png?{time.time_ns()}', reply_token, access_token)
 
     if re.match('最新氣象|查詢天氣|weather|Weather', msg):
         content = place.img_Carousel()
