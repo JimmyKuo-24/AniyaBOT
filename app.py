@@ -45,7 +45,7 @@ def callback():
             if json_data['events'][0]['message']['type'] == 'text':
                 text = json_data['events'][0]['message']['text']
                 if text == '雷達回波圖' or text == '雷達回波':
-                    reply_image(f'https://cwbopendata.s3.ap-northeast-1.amazonaws.com/MSC/O-A0058-003.png?{datetime.datetime.today()}', reply_token, access_token)
+                    reply_image(f'https://cwbopendata.s3.ap-northeast-1.amazonaws.com/MSC/O-A0058-003.png?{time.time()}', reply_token, access_token)
     except: 
         print("error")
     return 'OK'
@@ -293,9 +293,9 @@ def handle_message(event):
         content = Msg_Template.yt_channel()
         line_bot_api.reply_message(event.reply_token, content)
 
-    #################################### 目錄區 ##########################################
+    #################################### 氣象區 ##########################################
 
-    if re.match('最新氣象|查詢天氣|weather|Weather|', msg):
+    if re.match('最新氣象|查詢天氣|weather|Weather', msg):
         content = place.img_Carousel()
         line_bot_api.reply_message(event.reply_token, content)
         return 0
