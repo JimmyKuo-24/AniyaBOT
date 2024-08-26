@@ -50,11 +50,11 @@ def callback():
 #         print("error")
 #     return 'OK'
 
-def reply_image(msg, rk, token):
-    headers = {'Authorization': f'Bearer {token}', 'Content-Type': 'application/json'}
-    body = {'replyToken': rk, 'messages': [{'type': 'image', 'originalContentUrl': msg, 'previewImageUrl': msg}]}
-    req = requests.request('POST', 'https://api.line.me/v2/bot/message/reply', headers=headers, data=json.dumps(body).encode('utf-8'))
-    print(req.text)
+# def reply_image(msg, rk, token):
+#     headers = {'Authorization': f'Bearer {token}', 'Content-Type': 'application/json'}
+#     body = {'replyToken': rk, 'messages': [{'type': 'image', 'originalContentUrl': msg, 'previewImageUrl': msg}]}
+#     req = requests.request('POST', 'https://api.line.me/v2/bot/message/reply', headers=headers, data=json.dumps(body).encode('utf-8'))
+#     print(req.text)
 
 @handler.add(FollowEvent)
 def handle_follow(event):
@@ -296,8 +296,14 @@ def handle_message(event):
     #################################### 氣象區 ##########################################
 
     if re.match('雷達回波', msg):
-        reply_token = event.reply_token
-        reply_image(f'https://cwbopendata.s3.ap-northeast-1.amazonaws.com/MSC/O-A0058-001.png?{time.time_ns()}', reply_token, access_token)
+        url = f'https://cwbopendata.s3.ap-northeast-1.amazonaws.com/MSC/O-A0058-001.png?{time.time_ns()}'
+        img_msg = ImageSendMessage(
+            original_content_url=url,
+            preview_image_url=url
+        )
+        line_bot_api.reply_message(event.reply_token, img_msg)
+        # reply_token = event.reply_token
+        # reply_image(f'https://cwbopendata.s3.ap-northeast-1.amazonaws.com/MSC/O-A0058-001.png?{time.time_ns()}', reply_token, access_token)
 
     if re.match('最新氣象|查詢天氣|weather|Weather', msg):
         content = place.img_Carousel()
