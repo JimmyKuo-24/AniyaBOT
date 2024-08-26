@@ -23,7 +23,7 @@ def callback():
     try:
         handler.handle(body, signature)
         json_data = json.loads(body)
-        reply_token = json_data['events'][0]['replayToken']
+        reply_token = json_data['events'][0]['replyToken']
         user_id = json_data['events'][0]['source']['userId']
         print(json_data)
         if json_data['events'][0]['message']['type'] == 'text':
