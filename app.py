@@ -171,7 +171,7 @@ def leading_index():
     # 韭菜指數
     table7 = pd.read_html('https://www.taifex.com.tw/cht/3/futDailyMarketExcel?commodity_id=MTX', encoding='utf8')
     MTX = int(table7[0].iloc[-1, 12])
-    cut = round((leeks/MTX)*100, 3)
+    cut = round((leeks/MTX)*100, 1)
     
     return volume_0000, foreign_investors, investment_trust, DEALER, LOTS, leeks, date, large5, large10, TX, pcr, FPC, cut
 
