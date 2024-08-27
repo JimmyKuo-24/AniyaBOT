@@ -281,27 +281,45 @@ def handle_message(event):
 
     #################################### 氣象區 ##########################################
 
-    if re.match('雷達回波', msg):
-        url = 'https://www.cwa.gov.tw/Data/radar/CV1_3600.png'
-        radar_img = ImageSendMessage(
-            original_content_url=url,
-            preview_image_url=url
-        )
-        line_bot_api.reply_message(event.reply_token, radar_img)
-        
-        # reply_token = event.reply_token
-        # reply_image(f'https://cwbopendata.s3.ap-northeast-1.amazonaws.com/MSC/O-A0058-001.png?{time.time_ns()}', reply_token, access_token)
-
-    if re.match('最新氣象|查詢天氣|weather|Weather', msg):
+    if re.match('天氣|氣象|WEATHER', msg):
         content = place.img_Carousel()
         line_bot_api.reply_message(event.reply_token, content)
         return 0
 
-    if re.match('即時天氣|即時氣象', msg):
-        mat_d[uid] = '即時天氣'
-        content = place.quick_reply_weather(mat_d[uid])
+    if re.match('中央氣象|查詢天氣', msg):
+        uri = 'https://liff.line.me/2006134064-081mZO1b'
+        line_bot_api.reply_message(event.reply_token, URITemplateAction(uri=uri))
+    elif re.match('雷達回波', msg):
+        uri = 'https://liff.line.me/2006134064-QK1BXK1V'
+        line_bot_api.reply_message(event.reply_token, URITemplateAction(uri=uri))
+    elif re.match('UVI|紫外線', msg):
+        uri = 'https://liff.line.me/2006134064-vBqgJRqm'
+        line_bot_api.reply_message(event.reply_token, URITemplateAction(uri=uri)) 
+    elif re.match('AQI|空氣品質', msg):
+        uri = 'https://liff.line.me/2006134064-No8Y4085'
+        line_bot_api.reply_message(event.reply_token, URITemplateAction(uri=uri))
+
+    # if re.match('雷達回波', msg):
+    #     url = 'https://www.cwa.gov.tw/Data/radar/CV1_3600.png'
+    #     radar_img = ImageSendMessage(
+    #         original_content_url=url,
+    #         preview_image_url=url
+    #     )
+    #     line_bot_api.reply_message(event.reply_token, radar_img)
+
+    #     reply_token = event.reply_token
+    #     reply_image(f'https://cwbopendata.s3.ap-northeast-1.amazonaws.com/MSC/O-A0058-001.png?{time.time_ns()}', reply_token, access_token)
+
+    if re.match('水庫|地震|地址', msg):
+        content = place.quick_reply_earth()
         line_bot_api.reply_message(event.reply_token, content)
         return 0
+
+    # if re.match('即時天氣|即時氣象', msg):
+    #     mat_d[uid] = '即時天氣'
+    #     content = place.quick_reply_weather(mat_d[uid])
+    #     line_bot_api.reply_message(event.reply_token, content)
+    #     return 0
 
     #################################### 股票區 ##########################################
 

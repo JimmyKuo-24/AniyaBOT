@@ -393,8 +393,9 @@ def img_Carousel():
                             "url": "https://i.imgur.com/RUko8kX.png",
                             "flex": 1,
                             "action": {
-                            "type": "uri",
-                            "uri": "https://liff.line.me/2006134064-081mZO1b"
+                            "type": "message",
+                            "label": "action",
+                            "text": "中央氣象"
                             },
                             "gravity": "center",
                             "aspectMode": "cover",
@@ -427,7 +428,7 @@ def img_Carousel():
                             "action": {
                             "type": "message",
                             "label": "action",
-                            "text": "UV"
+                            "text": "UVI"
                             },
                             "size": "full"
                         },
@@ -458,16 +459,28 @@ def img_Carousel():
     )
     return flex_message
 
-#######################最新氣象-圖片轉盤#######################
+#######################QuickReply()#######################
 # 第二層-quick_reply(即時天氣+預測天氣)
 
-def quick_reply_weather(mat):
-    content_twxt = '請選擇您要查詢的天氣：'
+def quick_reply_earth():
+    content_twxt = '請選擇您要的資訊：'
     text_message = TextSendMessage(text=content_twxt, 
                                    quick_reply=QuickReply(
                                         items=[
-                                            QuickReplyButton(action=MessageAction(label='查詢其他天氣', text='其他'+mat)),
-                                            QuickReplyButton(action=LocationAction(label='地址查詢'))
+                                            QuickReplyButton(action=URIAction(label='水庫水情', uri='https://liff.line.me/2006134064-5m4wzp4V')),
+                                            QuickReplyButton(action=URIAction(label='地震測報', uri='https://liff.line.me/2006134064-5AXkvjX7')),
+                                            QuickReplyButton(action=LocationAction(label='查詢地址'))
                                         ]
                                    ))
     return text_message
+
+# def quick_reply_weather(mat):
+#     content_twxt = '請選擇您要查詢的天氣：'
+#     text_message = TextSendMessage(text=content_twxt, 
+#                                    quick_reply=QuickReply(
+#                                         items=[
+#                                             QuickReplyButton(action=MessageAction(label='查詢其他天氣', text='其他'+mat)),
+#                                             QuickReplyButton(action=LocationAction(label='查詢地址'))
+#                                         ]
+#                                    ))
+#     return text_message
