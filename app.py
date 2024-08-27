@@ -171,7 +171,7 @@ def leading_index():
     # 韭菜指數
     table7 = pd.read_html('https://www.taifex.com.tw/cht/3/futDailyMarketExcel?commodity_id=MTX', encoding='utf8')
     MTX = int(table7[0].iloc[-1, 12])
-    cut = round(leeks/MTX, 3)*100
+    cut = round((leeks/MTX)*100, 3)
     
     return volume_0000, foreign_investors, investment_trust, DEALER, LOTS, leeks, date, large5, large10, TX, pcr, FPC, cut
 
@@ -288,10 +288,11 @@ def handle_message(event):
 
     if re.match('中央氣象|查詢天氣', msg):
         uri = 'https://liff.line.me/2006134064-081mZO1b'
-        line_bot_api.reply_message(event.reply_token, URITemplateAction(uri=uri))
+        content = URITemplateAction(label='中央氣象', uri=uri)
+        line_bot_api.reply_message(event.reply_token, content)
     elif re.match('雷達回波', msg):
         uri = 'https://liff.line.me/2006134064-QK1BXK1V'
-        line_bot_api.reply_message(event.reply_token, URITemplateAction(uri=uri))
+        line_bot_api.reply_message(event.reply_token, URITemplateAction(label='雷達回波', uri=uri))
     elif re.match('UVI|紫外線', msg):
         uri = 'https://liff.line.me/2006134064-vBqgJRqm'
         line_bot_api.reply_message(event.reply_token, URITemplateAction(uri=uri)) 
