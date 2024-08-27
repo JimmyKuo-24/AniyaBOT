@@ -393,9 +393,9 @@ def img_Carousel():
                             "url": "https://i.imgur.com/RUko8kX.png",
                             "flex": 1,
                             "action": {
-                            "type": "message",
+                            "type": "uri",
                             "label": "action",
-                            "text": "中央氣象"
+                            "uri": "https://liff.line.me/2006134064-081mZO1b"
                             },
                             "gravity": "center",
                             "aspectMode": "cover",
@@ -407,9 +407,9 @@ def img_Carousel():
                             "aspectMode": "cover",
                             "gravity": "center",
                             "action": {
-                            "type": "message",
+                            "type": "uri",
                             "label": "action",
-                            "text": "雷達回波"
+                            "uri": "https://liff.line.me/2006134064-QK1BXK1V"
                             },
                             "size": "full"
                         }
@@ -426,9 +426,9 @@ def img_Carousel():
                             "aspectMode": "cover",
                             "gravity": "center",
                             "action": {
-                            "type": "message",
+                            "type": "uri",
                             "label": "action",
-                            "text": "UVI"
+                            "uri": "https://liff.line.me/2006134064-QK1BXK1V"
                             },
                             "size": "full"
                         },
@@ -440,9 +440,9 @@ def img_Carousel():
                             "aspectRatio": "150:150",
                             "gravity": "center",
                             "action": {
-                            "type": "message",
+                            "type": "uri",
                             "label": "action",
-                            "text": "AQI"
+                            "uri": "https://liff.line.me/2006134064-vBqgJRqm"
                             }
                         }
                         ],

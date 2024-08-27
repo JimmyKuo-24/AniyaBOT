@@ -286,19 +286,6 @@ def handle_message(event):
         line_bot_api.reply_message(event.reply_token, content)
         return 0
 
-    if re.match('中央氣象|查詢天氣', msg):
-        uri = 'https://liff.line.me/2006134064-081mZO1b'
-        line_bot_api.reply_message(event.reply_token, URIAction(label='中央氣象', uri=uri))
-    elif re.match('雷達回波', msg):
-        uri = 'https://liff.line.me/2006134064-QK1BXK1V'
-        line_bot_api.reply_message(event.reply_token, URIAction(label='雷達回波', uri=uri))
-    elif re.match('UVI|紫外線', msg):
-        uri = 'https://liff.line.me/2006134064-vBqgJRqm'
-        line_bot_api.reply_message(event.reply_token, URIAction(label='UVI', uri=uri)) 
-    elif re.match('AQI|空氣品質', msg):
-        uri = 'https://liff.line.me/2006134064-No8Y4085'
-        line_bot_api.reply_message(event.reply_token, URIAction(label='AQI', uri=uri))
-
     # if re.match('雷達回波', msg):
     #     url = 'https://www.cwa.gov.tw/Data/radar/CV1_3600.png'
     #     radar_img = ImageSendMessage(
