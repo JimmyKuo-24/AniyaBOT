@@ -117,77 +117,63 @@ def push_msg(event, msg):
         room_id = event.source.user_id
         line_bot_api.push_message(room_id, TextSendMessage(text=msg))
 
-
 def Usage(event):
     guide_msg = Msg_Template.usage_msg()
     line_bot_api.reply_message(event.reply_token, guide_msg)
-    
-def volume0000():
-    table = pd.read_html('https://www.twse.com.tw/rwd/zh/afterTrading/MI_INDEX?response=html', encoding='utf8')
-    volume_0000 = round(table[0].iloc[16, 1]/10**8)
-    
-    return volume_0000
 
-def II3():   # institutional investors 三大法人
-    table = pd.read_html('https://www.twse.com.tw/rwd/zh/fund/BFI82U?response=html', encoding='utf8')
-    foreign_investors = round(int(str(table[0].iloc[3, 3]).replace(',',''))/10**8, 1)
-    investment_trust = round(int(str(table[0].iloc[2, 3]).replace(',',''))/10**8, 1)
-    dealer = int(str(table[0].iloc[0, 3]).replace(',',''))/10**8
-    dealer_hedge = int(str(table[0].iloc[1, 3]).replace(',',''))/10**8
+
+def leading_index():
+    # 成交量(億)
+    table0 = pd.read_html('https://www.twse.com.tw/rwd/zh/afterTrading/MI_INDEX?response=html', encoding='utf8')
+    volume_0000 = round(table0[0].iloc[16, 1]/10**8)
+
+    # 外資(億)、投信(億)、自營(億)
+    table1 = pd.read_html('https://www.twse.com.tw/rwd/zh/fund/BFI82U?response=html', encoding='utf8')
+    foreign_investors = round(int(str(table1[0].iloc[3, 3]).replace(',',''))/10**8, 1)
+    investment_trust = round(int(str(table1[0].iloc[2, 3]).replace(',',''))/10**8, 1)
+    dealer = int(str(table1[0].iloc[0, 3]).replace(',',''))/10**8
+    dealer_hedge = int(str(table1[0].iloc[1, 3]).replace(',',''))/10**8
     DEALER = round(dealer + dealer_hedge, 1)
 
-    return foreign_investors, investment_trust, DEALER
-
-def FI_futures():
-    table = pd.read_html('https://www.taifex.com.tw/cht/3/futContractsDateExcel', encoding='utf8')
-    big = str(table[1].iloc[2, 13]).replace(',','')
-    small = str(table[1].iloc[11, 13]).replace(',','')
-    micro = str(table[1].iloc[14, 13]).replace(',','')
+    # 外資(期)(口)
+    table2 = pd.read_html('https://www.taifex.com.tw/cht/3/futContractsDateExcel', encoding='utf8')
+    big = str(table2[1].iloc[2, 13]).replace(',','')
+    small = str(table2[1].iloc[11, 13]).replace(',','')
+    micro = str(table2[1].iloc[14, 13]).replace(',','')
     LOTS = round(int(big) + int(small)/4 + int(micro)/20)
-    
-    leeks = -(int(str(table[1].iloc[9, 13]).replace(',','')) + int(str(table[1].iloc[10, 13]).replace(',','')) + int(small))
-    
-    return LOTS, leeks
+    leeks = -(int(str(table2[1].iloc[9, 13]).replace(',','')) + int(str(table2[1].iloc[10, 13]).replace(',','')) + int(small))
 
-def futures_large():
-    table = pd.read_html('https://www.taifex.com.tw/cht/3/largeTraderFutQryTbl', encoding='utf8')
-    B5 = str(table[1].iloc[2, 2]).replace(',','').split()
-    S5 = str(table[1].iloc[2, 6]).replace(',','').split()
+    # 前五大(口)、前十大(口)
+    table3 = pd.read_html('https://www.taifex.com.tw/cht/3/largeTraderFutQryTbl', encoding='utf8')
+    B5 = str(table3[1].iloc[2, 2]).replace(',','').split()
+    S5 = str(table3[1].iloc[2, 6]).replace(',','').split()
     large5 = int(B5[0]) - int(S5[0])
-    B10 = str(table[1].iloc[2, 4]).replace(',','').split()
-    S10 = str(table[1].iloc[2, 8]).replace(',','').split()
+    B10 = str(table3[1].iloc[2, 4]).replace(',','').split()
+    S10 = str(table3[1].iloc[2, 8]).replace(',','').split()
     large10 = int(B10[0]) - int(S10[0])
+    # 日期
+    date = table3[0].iloc[0, 0]
 
-    date = table[0].iloc[0, 0]
+    # 大台(期)(口)
+    table4 = pd.read_html('https://www.taifex.com.tw/cht/3/futDailyMarketExcel', encoding='utf8')
+    TX = int(table4[0].iloc[-1, 12])
 
-    return date, large5, large10
+    # PCR
+    table5 = pd.read_html('https://www.taifex.com.tw/cht/3/pcRatioExcel', encoding='utf8')
+    pcr = float(table5[2].iloc[0, 6])
 
-def futures():
-    table = pd.read_html('https://www.taifex.com.tw/cht/3/futDailyMarketExcel', encoding='utf8')
-    TX = int(table[0].iloc[-1, 12])
-
-    return TX
-
-def PCR():
-    table = pd.read_html('https://www.taifex.com.tw/cht/3/pcRatioExcel', encoding='utf8')
-    pcr = float(table[2].iloc[0, 6])
-    
-    return pcr
-
-def putcall():
-    table = pd.read_html('https://www.taifex.com.tw/cht/3/callsAndPutsDateExcel', encoding='utf8')
-    fcall = str(table[2].iloc[2,15]).replace(',','')
-    fput = str(table[2].iloc[5,15]).replace(',','')
+    # 外資(選)(億)
+    table6 = pd.read_html('https://www.taifex.com.tw/cht/3/callsAndPutsDateExcel', encoding='utf8')
+    fcall = str(table6[2].iloc[2,15]).replace(',','')
+    fput = str(table6[2].iloc[5,15]).replace(',','')
     FPC = round((int(fcall) - int(fput))/10**5, 3)
 
-    return FPC
-
-def cut_leeks(leeks):
-    table = pd.read_html('https://www.taifex.com.tw/cht/3/futDailyMarketExcel?commodity_id=MTX', encoding='utf8')
-    MTX = int(table[0].iloc[-1, 12])
-    cut = round(11426/MTX, 3)*100
-
-    return cut
+    # 韭菜指數
+    table7 = pd.read_html('https://www.taifex.com.tw/cht/3/futDailyMarketExcel?commodity_id=MTX', encoding='utf8')
+    MTX = int(table7[0].iloc[-1, 12])
+    cut = round(leeks/MTX, 3)*100
+    
+    return volume_0000, foreign_investors, investment_trust, DEALER, LOTS, leeks, date, large5, large10, TX, pcr, FPC, cut
 
 
 @handler.add(MessageEvent, message=TextMessage)
@@ -302,6 +288,7 @@ def handle_message(event):
             preview_image_url=url
         )
         line_bot_api.reply_message(event.reply_token, radar_img)
+        
         # reply_token = event.reply_token
         # reply_image(f'https://cwbopendata.s3.ap-northeast-1.amazonaws.com/MSC/O-A0058-001.png?{time.time_ns()}', reply_token, access_token)
 
@@ -486,14 +473,7 @@ def handle_message(event):
 
     if re.match('先行指標', msg):
         try:
-            volume_0000 = volume0000()
-            foreign_investors, investment_trust, DEALER = II3()
-            LOTS, leeks = FI_futures()
-            date, large5, large10 = futures_large()
-            TX = futures()
-            pcr = PCR()
-            FPC = putcall()
-            cut = cut_leeks(leeks)
+            volume_0000, foreign_investors, investment_trust, DEALER, LOTS, leeks, date, large5, large10, TX, pcr, FPC, cut = leading_index()
         except:
             line_bot_api.reply_message(event.reply_token, TextSendMessage(text='先行指標資料取得失敗'))
             return 0
