@@ -467,9 +467,9 @@ def quick_reply_earth():
     text_message = TextSendMessage(text=content_twxt, 
                                    quick_reply=QuickReply(
                                         items=[
-                                            QuickReplyButton(action=URIAction(label='水庫水情', uri='https://liff.line.me/2006134064-5m4wzp4V')),
-                                            QuickReplyButton(action=URIAction(label='地震測報', uri='https://liff.line.me/2006134064-5AXkvjX7')),
-                                            QuickReplyButton(action=LocationAction(label='查詢地址'))
+                                            QuickReplyButton(action=URIAction(label='💧💧水庫水情', uri='https://liff.line.me/2006134064-5m4wzp4V')),
+                                            QuickReplyButton(action=URIAction(label='🌋🌋地震測報', uri='https://liff.line.me/2006134064-5AXkvjX7')),
+                                            QuickReplyButton(action=LocationAction(label='🏠🏠查詢地址'))
                                         ]
                                    ))
     return text_message

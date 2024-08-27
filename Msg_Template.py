@@ -62,7 +62,7 @@ def follow_msg():
                     "contents": [
                     {
                         "type": "text",
-                        "text": "★★ 這裡有 股票、匯率、油價 資訊",
+                        "text": "★★ 股票、匯率、油價、氣象 の資訊",
                         "size": "sm",
                         "flex": 5
                     }
@@ -144,8 +144,8 @@ def realtime_currency_other(currency):
                                        ),
                                         QuickReplyButton(
                                                 action=MessageAction(
-                                                    label="💰💰6個月趨勢圖", 
-                                                    text="CT"+currency,
+                                                    label="💰💰刪除外幣", 
+                                                    text="刪除"+currency,
                                                 )
                                        ),
                                 ]

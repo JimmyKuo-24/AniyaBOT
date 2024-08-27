@@ -98,7 +98,7 @@ def plot_stock_k_chart(IMGUR_CLIENT_ID, stock='0050', date_from='2021-01-01'):
             return None
 
         print(f'正在繪製股票K線圖: {stock}')
-        mpf.plot(df, type='candle', mav=(5, 20), volume=True, ylabel=stock.upper() + 'Price', savefig=f'{stock}.png')
+        mpf.plot(df, type='candle', mav=(5, 20), volume=True, ylabel=stock.upper() + 'D', savefig=f'{stock}.png')
 
         PATH = f'{stock}.png'
         im = pyimgur.Imgur(IMGUR_CLIENT_ID)
@@ -288,17 +288,16 @@ def handle_message(event):
 
     if re.match('中央氣象|查詢天氣', msg):
         uri = 'https://liff.line.me/2006134064-081mZO1b'
-        content = URITemplateAction(label='中央氣象', uri=uri)
-        line_bot_api.reply_message(event.reply_token, content)
+        line_bot_api.reply_message(event.reply_token, URIAction(label='中央氣象', uri=uri))
     elif re.match('雷達回波', msg):
         uri = 'https://liff.line.me/2006134064-QK1BXK1V'
-        line_bot_api.reply_message(event.reply_token, URITemplateAction(label='雷達回波', uri=uri))
+        line_bot_api.reply_message(event.reply_token, URIAction(label='雷達回波', uri=uri))
     elif re.match('UVI|紫外線', msg):
         uri = 'https://liff.line.me/2006134064-vBqgJRqm'
-        line_bot_api.reply_message(event.reply_token, URITemplateAction(uri=uri)) 
+        line_bot_api.reply_message(event.reply_token, URIAction(label='UVI', uri=uri)) 
     elif re.match('AQI|空氣品質', msg):
         uri = 'https://liff.line.me/2006134064-No8Y4085'
-        line_bot_api.reply_message(event.reply_token, URITemplateAction(uri=uri))
+        line_bot_api.reply_message(event.reply_token, URIAction(label='AQI', uri=uri))
 
     # if re.match('雷達回波', msg):
     #     url = 'https://www.cwa.gov.tw/Data/radar/CV1_3600.png'
@@ -606,7 +605,7 @@ def handle_message(event):
         if EXRate.getCurrencyName(currency) == "無可支援的外幣":
             line_bot_api.push_message(uid, TextSendMessage('無可支援的外幣'))
             return 0
-        line_bot_api.push_message(uid, TextSendMessage('請稍等，匯率趨勢圖生成中'))
+        line_bot_api.push_message(uid, TextSendMessage('請稍等，匯率趨勢生成中'))
         cash_imgurl = EXRate.cash_exrate_sixMonth(currency)            
         if cash_imgurl == "現金匯率無資料可分析":
             line_bot_api.push_message(uid, TextSendMessage('現金匯率無資料可分析'))
