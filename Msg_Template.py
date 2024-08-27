@@ -657,7 +657,7 @@ def usage_msg():
                     "action": {
                     "type": "message",
                     "label": "換匯試算",
-                    "text": "換匯幣別(1)/幣別(2)/金額 (TWD/USD/10000)"
+                    "text": "換匯幣別(1)/幣別(2)/金額\n(換匯TWD/USD/10000)"
                     },
                     "color": "#FFDA76",
                     "style": "secondary"
