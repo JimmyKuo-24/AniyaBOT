@@ -4,7 +4,7 @@ from linebot.exceptions import InvalidSignatureError
 from linebot.models import *
 from line_bot import *
 from bs4 import BeautifulSoup
-import datetime, EXRate , json, numpy as np, pandas as pd, place, re, requests, schedule, time, twstock, mongodb, mplfinance as mpf, Msg_Template, pyimgur, yfinance as yf
+import datetime, EXRate , io, json, numpy as np, pandas as pd, place, re, requests, schedule, time, twstock, mongodb, mplfinance as mpf, Msg_Template, pyimgur, yfinance as yf
 from tensorflow.keras.models import load_model
 from PIL import Image
 from openai import OpenAI
@@ -68,6 +68,17 @@ def preprocess_image(image):
     image = np.expand_dims(image, axis=0)
     image = np.expand_dims(image, axis=-1)
     return image
+
+@handler.add(MessageEvent, message=ImageMessage)
+def handle_image_message(event):
+    message_content = line_bot_api.get_message_content(event.message.id)
+    image = Image.open(io.BytesIO(message_content.content))
+
+    image = preprocess_image(image)
+    prediction = model.predict(image)
+    result = np.argmax(prediction)
+
+    line_bot_api.reply_message(event.reply_token, TextSendMessage(text=f'預測的數字是: {result}'))
 
 
 @handler.add(FollowEvent)
