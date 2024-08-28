@@ -546,7 +546,7 @@ def usage_msg():
                     "action": {
                     "type": "message",
                     "label": "股價提醒",
-                    "text": "股價提醒"
+                    "text": "股價提醒 (15s)"
                     },
                     "color": "#EECAD5",
                     "style": "secondary"
