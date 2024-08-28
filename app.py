@@ -4,7 +4,9 @@ from linebot.exceptions import InvalidSignatureError
 from linebot.models import *
 from line_bot import *
 from bs4 import BeautifulSoup
-import datetime, EXRate , json, pandas as pd, place, re, requests, schedule, time, twstock, mongodb, mplfinance as mpf, Msg_Template, pyimgur, yfinance as yf
+import datetime, EXRate , json, numpy as np, pandas as pd, place, re, requests, schedule, time, twstock, mongodb, mplfinance as mpf, Msg_Template, pyimgur, yfinance as yf
+from tensorflow.keras.models import load_model
+from PIL import Image
 from openai import OpenAI
 
 # push_message free 200則/月
@@ -55,6 +57,18 @@ def callback():
 #     body = {'replyToken': rk, 'messages': [{'type': 'image', 'originalContentUrl': msg, 'previewImageUrl': msg}]}
 #     req = requests.request('POST', 'https://api.line.me/v2/bot/message/reply', headers=headers, data=json.dumps(body).encode('utf-8'))
 #     print(req.text)
+
+model = load_model('mnist_cnn_model.h5')
+
+def preprocess_image(image):
+    image = image.resize((28, 28))
+    image = image.convert('L')
+    image = np.array(image)
+    image = image / 255.0
+    image = np.expand_dims(image, axis=0)
+    image = np.expand_dims(image, axis=-1)
+    return image
+
 
 @handler.add(FollowEvent)
 def handle_follow(event):
@@ -278,6 +292,9 @@ def handle_message(event):
     if msg == '財經學堂':
         content = Msg_Template.yt_channel()
         line_bot_api.reply_message(event.reply_token, content)
+
+    if re.match('圖像辨識', msg):
+        line_bot_api.reply_message(event.reply_token, TextSendMessage(text='請上傳圖片'))
 
     #################################### 氣象區 ##########################################
 
