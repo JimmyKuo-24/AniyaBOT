@@ -430,9 +430,9 @@ def handle_message(event):
             for i in range(len(datalist)):
                 for j in range(len(datalist[i])):
                     look_stock_price(datalist[i][j]['favorite_stock'], datalist[i][j]['condition'], datalist[i][j]['price'], datalist[i][j]['userID'])
-                    
 
-        schedule.every(10).seconds.do(job).tag('dalily-task-stock'+uid, 'second')
+
+        schedule.every(12).seconds.do(job).tag('dalily-task-stock'+uid, 'second')
         while True: 
             schedule.run_pending()
             time.sleep(1)
